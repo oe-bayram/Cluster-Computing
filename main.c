@@ -351,7 +351,7 @@ int main(int argc, char **argv)
    MPI_Comm_rank(MPI_COMM_WORLD, &node);
    MPI_Status status;
    
-   sci_desc_t v_dev;
+   sci_desc_t	v_dev;
    sci_error_t error;
 
    SCIInitialize(NO_FLAGS, &error);
@@ -403,7 +403,8 @@ int main(int argc, char **argv)
       C.rows = A.rows;
       C.columns = B.columns;
 	   
-      unsigned int SEGMENT_SIZE = A_size+B_size+C_size+4;
+      //unsigned int SEGMENT_SIZE = A_size+B_size+C_size+4;
+	  unsigned int SEGMENT_SIZE = 10000;
 	   
       printf("prepare segment: %d \n", SEGMENT_SIZE);
 	   
