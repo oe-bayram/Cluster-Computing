@@ -380,13 +380,15 @@ int main(int argc, char **argv)
    matrix C = nmatrix;
    
    if(node == 0) {
+	   printf("I am node 0 &d\n", local_node_id);
       sci_local_segment_t local_segment;
       int *local_address;
       sci_map_t local_map;
-
+		printf("Reading matrix A\n");
       read_matrix(argv[1], &A);
+	  printf("Reading matrix B\n");
       read_matrix(argv[2], &B);
-       
+       printf("Building A_rest and C_part\n");
       matrix A_rest 	= nmatrix;
       matrix C_part 	= nmatrix;
       
