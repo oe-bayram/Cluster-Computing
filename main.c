@@ -385,8 +385,6 @@ int main(int argc, char **argv)
       int *local_address;
       sci_map_t local_map;
 
-      printf("Master segment size: %d\n", SEGMENT_SIZE);
-
       read_matrix(argv[1], &A);
       read_matrix(argv[2], &B);
        
