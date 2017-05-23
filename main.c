@@ -1,11 +1,10 @@
+#include <sisci_api.h>
+#include <sisci_error.h>
 #include <stdio.h>
 #include <mpi.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-#include <sisci_api.h>
-#include <sisci_error.h>
 
 #define NO_FLAGS 0
 #define NO_CALLBACK 0
@@ -398,9 +397,9 @@ int main(int argc, char **argv)
       double time = MPI_Wtime();
 
       // send_matrix_parts(A, B, &A_rest, comm_size);
-      int A_size = A->columns * A->rows;
-      int B_size = B->columns * B->rows;
-      int C_size = B->columns * A->rows;
+      int A_size = A.columns * A.rows;
+      int B_size = B.columns * B.rows;
+      int C_size = B.columns * A.rows;
       C.rows = A.rows;
       C.columns = B.columns;
 	   
