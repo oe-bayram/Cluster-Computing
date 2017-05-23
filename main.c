@@ -419,11 +419,11 @@ int main(int argc, char **argv)
       local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
 		
-      int *pos = local_segment;	
-      local_segment[0] = A.rows;
-      local_segment[1] = A.columns;
-      local_segment[2] = B.rows;
-      local_segment[3] = B.columns;
+      int *pos = local_address;	
+      local_address[0] = A.rows;
+      local_address[1] = A.columns;
+      local_address[2] = B.rows;
+      local_address[3] = B.columns;
       pos +=4;
       memcpy(pos, A.matrix, A_size);
       pos +=A_size;
