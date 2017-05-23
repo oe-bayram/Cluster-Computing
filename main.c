@@ -403,8 +403,7 @@ int main(int argc, char **argv)
       C.rows = A.rows;
       C.columns = B.columns;
 	   
-      //unsigned int SEGMENT_SIZE = A_size+B_size+C_size+4;
-	  unsigned int SEGMENT_SIZE = 10000;
+      unsigned int SEGMENT_SIZE = A_size+B_size+C_size+4;
 	   
       printf("prepare segment: %d \n", SEGMENT_SIZE);
 	   
