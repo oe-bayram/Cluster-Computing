@@ -380,7 +380,7 @@ int main(int argc, char **argv)
    matrix C = nmatrix;
    
    if(node == 0) {
-	   printf("I am node 0 &d\n", local_node_id);
+	   printf("I am node 0 %d \n", local_node_id);
       sci_local_segment_t local_segment;
       int *local_address;
       sci_map_t local_map;
@@ -400,8 +400,11 @@ int main(int argc, char **argv)
 
       // send_matrix_parts(A, B, &A_rest, comm_size);
       int A_size = A.columns * A.rows;
+	  printf("A_size: %d \n", A_size);
       int B_size = B.columns * B.rows;
+	  printf("B_size: %d \n", B_size);
       int C_size = B.columns * A.rows;
+	  printf("C_size: %d \n", C_size);
       C.rows = A.rows;
       C.columns = B.columns;
 	   
