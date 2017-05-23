@@ -346,21 +346,21 @@ void write_matrix(char * filename, matrix C)
 int main(int argc, char **argv)
 {
    int node;
-   
+   printf("main started\n");
    MPI_Init(&argc,&argv);
    MPI_Comm_rank(MPI_COMM_WORLD, &node);
    MPI_Status status;
-   
+	
    sci_desc_t	v_dev;
    sci_error_t error;
 
    SCIInitialize(NO_FLAGS, &error);
-
+   printf("SCI initialized\n");
    if(error != SCI_ERR_OK)
    printf("error Init\n");
 
    SCIOpen(&v_dev, NO_FLAGS, &error);
-
+   printf("SCI opened\n");
    if(error != SCI_ERR_OK) {
    printf("Error Open\n");
       return 1;
@@ -372,7 +372,7 @@ int main(int argc, char **argv)
    query.localAdapterNo = ADAPTER_NO;
    query.data = &local_node_id;
    SCIQuery(SCI_Q_ADAPTER, &query, NO_FLAGS, &error);
-  
+   printf("got node id\n");
    printf("Node id: %d\n", local_node_id);
 
    matrix A = nmatrix;
@@ -463,7 +463,7 @@ int main(int argc, char **argv)
       unsigned int segment_size;
       volatile int *remote_address;
       MPI_Status status;
-      MPI_Recv(master_node_id, 1, MPI_INT, 0, MASTER_NODE, MPI_COMM_WORLD, &status);
+      MPI_Recv(&master_node_id, 1, MPI_INT, 0, MASTER_NODE, MPI_COMM_WORLD, &status);
 
       SCIConnectSegment(v_dev, &remote_segment, local_node_id, SEGMENT_ID, ADAPTER_NO,
 		    NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
