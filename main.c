@@ -10,7 +10,7 @@
 #define NO_CALLBACK 0
 #define NO_ARG 0
 
-#define SEGMENT_ID 3
+#define SEGMENT_ID 6
 #define ADAPTER_NO 0
 
 
@@ -449,7 +449,8 @@ int main(int argc, char **argv)
       // recv_build_matrix(C_part, &C, comm_size);
       // MPI_Barrier() wait for the other nodes to end
       // read result matrix from the segment section C-
-       
+      
+	  MPI_Barrier(MPI_COMM_WORLD);
       time = MPI_Wtime() - time;
       printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
       //print_matrix(C);
@@ -468,7 +469,9 @@ int main(int argc, char **argv)
       unsigned int segment_size;
       volatile int *remote_address;
       MPI_Status status;
-      MPI_Recv(&master_node_id, 1, MPI_INT, 0, MASTER_NODE, MPI_COMM_WORLD, &status);
+      MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	  
+	  printf("received master_node_id: %d\n", master_node_id);
 
       SCIConnectSegment(v_dev, &remote_segment, local_node_id, SEGMENT_ID, ADAPTER_NO,
 		    NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
@@ -489,7 +492,7 @@ int main(int argc, char **argv)
       //multiply_matrix(A, B, &C_part);
       // send_matrix_result(C_part);
       // write result to segment
-      // MBI_Barrier
+      MPI_Barrier(MPI_COMM_WORLD);
       free_matrix(&C_part);
    }
 
