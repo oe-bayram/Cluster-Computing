@@ -350,6 +350,9 @@ int main(int argc, char **argv)
    MPI_Init(&argc,&argv);
    MPI_Comm_rank(MPI_COMM_WORLD, &node);
    MPI_Status status;
+   
+   int comm_size;
+   MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
 	
    sci_desc_t	v_dev;
    sci_error_t error;
@@ -373,7 +376,7 @@ int main(int argc, char **argv)
    query.data = &local_node_id;
    SCIQuery(SCI_Q_ADAPTER, &query, NO_FLAGS, &error);
    printf("got node id\n");
-   printf("Node id: %d\n", local_node_id);
+   printf("Node ID: %d and Local Node id: %d\n", node, local_node_id);
 
    matrix A = nmatrix;
    matrix B = nmatrix;
@@ -391,10 +394,7 @@ int main(int argc, char **argv)
        printf("Building A_rest and C_part\n");
       matrix A_rest 	= nmatrix;
       matrix C_part 	= nmatrix;
-      
-      int comm_size;
-      MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
-       
+
       printf("start calculation\n");
       double time = MPI_Wtime();
 
@@ -487,6 +487,8 @@ int main(int argc, char **argv)
 
       printf("Node: %d, first two array value: %d, %d\n", local_node_id,
       remote_address[0], remote_address[1]);
+	  
+	  int chunk_size = ceil(remote_address[0] / comm_size);
 
       // read from segment depending on node id
       //multiply_matrix(A, B, &C_part);
