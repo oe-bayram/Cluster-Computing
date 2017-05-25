@@ -501,28 +501,26 @@ int main(int argc, char **argv)
       printf("Node: %d, first two array value: %d, %d\n", local_node_id,
       remote_address[0], remote_address[1]);
 	  
-	  
-	  
 	  int chunk_size = ceil(A.rows / comm_size);
 	  A.rows = chunk_size;
 	  A.columns = remote_address[1];
 	  B.rows = remote_address[2];
 	  B.columns = remote_address[3];
-	  
+	  printf("Checkpoint 1");
 	  int *A_pos = remote_address;
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
 	  memcpy(A.matrix, A_pos, chunk_size * A.columns);
 	  int *B_pos = remote_address;
 	  B_pos += 4 + A.rows * A.columns;
 	  memcpy(B.matrix, B_pos, B.rows * B.columns);
-
+	  printf("Checkpoint 2");
       multiply_matrix(A, B, &C_part);
-	  
+	  printf("Checkpoint 3");
 	  int *C_pos = remote_address;
 	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
 	  C_pos += (node-1) * chunk_size * B.columns;
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
-	  
+	  printf("Checkpoint 4");
       MPI_Barrier(MPI_COMM_WORLD);
       free_matrix(&C_part);
    }
