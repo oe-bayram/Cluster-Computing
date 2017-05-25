@@ -501,7 +501,7 @@ int main(int argc, char **argv)
       printf("Node: %d, first two array value: %d, %d\n", local_node_id,
       remote_address[0], remote_address[1]);
 	  
-	  int chunk_size = ceil(A.rows / comm_size);
+	  int chunk_size = ceil(remote_address[0] / comm_size);
 	  A.rows = chunk_size;
 	  printf("A.rows size: %d\n", A.rows);
 	  A.columns = remote_address[1];
