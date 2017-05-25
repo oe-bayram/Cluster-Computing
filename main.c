@@ -430,9 +430,9 @@ int main(int argc, char **argv)
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
-      memcpy(pos, A.matrix, A_size);
+      memcpy(pos, A.matrix, A_size * sizeof(int));
       pos +=A_size;
-      memcpy(pos, B.matrix, B_size);
+      memcpy(pos, B.matrix, B_size * sizeof(int));
       pos +=B_size;
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
