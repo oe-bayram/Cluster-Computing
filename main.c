@@ -454,9 +454,9 @@ int main(int argc, char **argv)
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
 	  printf("2. Adress of A_pos is: %p\n", A_pos);
 	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns);
-	   
+	  printf("3. Adress of A_pos is: %p\n", A_pos);
       multiply_matrix(A_rest, B, &C_part);
-	  
+	  printf("4. Adress of A_pos is: %p\n", A_pos);
 	  int *C_pos = local_address;
 	  printf("1. Adress of C_pos is: %p\n", C_pos);
 	  C_pos += 4 + A_size + B_size;
