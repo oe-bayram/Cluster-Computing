@@ -441,8 +441,8 @@ int main(int argc, char **argv)
       MPI_Bcast(&local_node_id, 1, MPI_INT, node, MPI_COMM_WORLD);
 
 	  int chunk_size = ceil(A.rows / comm_size);
-	  A_rest->rows = A.rows - (comm_size-1) * chunk_size;
-	  A_rest->columns = A.columns;
+	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
+	  A_rest.columns = A.columns;
 	  int *A_pos = A.matrix;
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
 	  
