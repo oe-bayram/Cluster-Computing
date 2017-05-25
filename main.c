@@ -439,21 +439,34 @@ int main(int argc, char **argv)
 
       // send segment information to other nodes
       MPI_Bcast(&local_node_id, 1, MPI_INT, node, MPI_COMM_WORLD);
+
+	  int chunk_size = ceil(A.rows / comm_size);
+	  A_rest->rows = A.rows - (comm_size-1) * chunk_size;
+	  A_rest->columns = A.columns;
+	  int *A_pos = A.matrix;
+	  A_pos += (comm_size-1) * chunk_size * A.columns;
+	  
+	  memcpy(A_rest->matrix, A_pos, chunk_size * A.columns);
 	   
-      //multiply_matrix(A_rest, B, &C_part);
-
-      matrix C = nmatrix;
-      C.rows = A.rows;
-      C.columns	= B.columns;
-
-      // recv_build_matrix(C_part, &C, comm_size);
-      // MPI_Barrier() wait for the other nodes to end
-      // read result matrix from the segment section C-
+      multiply_matrix(A_rest, B, &C_part);
+	  
+	  int *C_pos = local_address;
+	  C_pos += 4 + A_size + B_size;
+	  C_pos += (comm_size-1) * chunk_size * B.columns;
+	  memcpy(C_pos, C_part, C_part.rows * C_part.columns);
        
       MPI_Barrier(MPI_COMM_WORLD);
+	  
+	  matrix C = nmatrix;
+	  int *C_end_pos = local_address;
+	  C_end_pos += 4 + A_size + B_size;
+	  memcpy(C->matrix, C_end_pos, C_size);
+      C.rows = A.rows;
+      C.columns	= B.columns;
+	  
       time = MPI_Wtime() - time;
       printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
-      //print_matrix(C);
+      print_matrix(C);
 	      
       write_matrix(argv[3], C);
 
@@ -488,12 +501,28 @@ int main(int argc, char **argv)
       printf("Node: %d, first two array value: %d, %d\n", local_node_id,
       remote_address[0], remote_address[1]);
 	  
-	  int chunk_size = ceil(remote_address[0] / comm_size);
+	  
+	  
+	  int chunk_size = ceil(A.rows / comm_size);
+	  A->rows = chunk_size;
+	  A->columns = remote_address[1];
+	  B->rows = remote_address[2];
+	  B->columns = remote_address[3];
+	  
+	  int *A_pos = remote_address;
+	  A_pos += (node-1) * chunk_size * A.columns + 4;
+	  memcpy(A->matrix, A_pos, chunk_size * A.columns);
+	  int *B_pos = remote_address;
+	  B_pos += 4 + A.rows * A.columns;
+	  memcpy(B->matrix, B_pos, B.rows * B.columns);
 
-      // read from segment depending on node id
-      //multiply_matrix(A, B, &C_part);
-      // send_matrix_result(C_part);
-      // write result to segment
+      multiply_matrix(A, B, &C_part);
+	  
+	  int *C_pos = remote_address;
+	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
+	  C_pos += (node-1) * chunk_size * B.columns;
+	  memcpy(C_pos, C_part, C_part.rows * C_part.columns);
+	  
       MPI_Barrier(MPI_COMM_WORLD);
       free_matrix(&C_part);
    }
