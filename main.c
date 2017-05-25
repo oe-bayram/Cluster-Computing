@@ -435,8 +435,9 @@ int main(int argc, char **argv)
 	  printf("2. Adress of pos is: %p\n", pos);
       pos +=A_size;
 	  printf("3a. Adress of pos is: %p\n", pos);
+	  printf("3b. Adress of B_size is: %d\n", B_size * sizeof(int));
       memcpy(pos, B.matrix, B_size * sizeof(int));
-	  printf("3b. Adress of pos is: %p\n", pos);
+	  printf("3c. Adress of pos is: %p\n", pos);
       pos +=B_size;
 	  printf("4. Adress of pos is: %p\n", pos);
 		
