@@ -453,14 +453,14 @@ int main(int argc, char **argv)
 	  int *C_pos = local_address;
 	  C_pos += 4 + A_size + B_size;
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part->matrix, C_part.rows * C_part.columns);
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
        
       MPI_Barrier(MPI_COMM_WORLD);
 	  
 	  matrix C = nmatrix;
 	  int *C_end_pos = local_address;
 	  C_end_pos += 4 + A_size + B_size;
-	  memcpy(C->matrix, C_end_pos, C_size);
+	  memcpy(C.matrix, C_end_pos, C_size);
       C.rows = A.rows;
       C.columns	= B.columns;
 	  
@@ -504,10 +504,10 @@ int main(int argc, char **argv)
 	  
 	  
 	  int chunk_size = ceil(A.rows / comm_size);
-	  A->rows = chunk_size;
-	  A->columns = remote_address[1];
-	  B->rows = remote_address[2];
-	  B->columns = remote_address[3];
+	  A.rows = chunk_size;
+	  A.columns = remote_address[1];
+	  B.rows = remote_address[2];
+	  B.columns = remote_address[3];
 	  
 	  int *A_pos = remote_address;
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
