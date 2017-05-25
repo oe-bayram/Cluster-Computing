@@ -424,16 +424,20 @@ int main(int argc, char **argv)
       local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
 		
-      int *pos = local_address;	
+      int *pos = local_address;
+	  printf("1. Adress of pos is: %d\n", pos);
       local_address[0] = A.rows;
       local_address[1] = A.columns;
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
       memcpy(pos, A.matrix, A_size * sizeof(int));
+	  printf("2. Adress of pos is: %d\n", pos);
       pos +=A_size;
       memcpy(pos, B.matrix, B_size * sizeof(int));
+	  printf("3. Adress of pos is: %d\n", pos);
       pos +=B_size;
+	  printf("4. Adress of pos is: %d\n", pos);
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -444,22 +448,27 @@ int main(int argc, char **argv)
 	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
 	  A_rest.columns = A.columns;
 	  int *A_pos = A.matrix;
+	  printf("1. Adress of A_pos is: %d\n", pos);
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
-	  
+	  printf("2. Adress of A_pos is: %d\n", pos);
 	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns * sizeof(int));
 	   
       multiply_matrix(A_rest, B, &C_part);
 	  
 	  int *C_pos = local_address;
+	  printf("1. Adress of C_pos is: %d\n", pos);
 	  C_pos += 4 + A_size + B_size;
+	  printf("2. Adress of C_pos is: %d\n", pos);
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
-       
+      printf("3. Adress of C_pos is: %d\n", pos);
       MPI_Barrier(MPI_COMM_WORLD);
 	  
 	  matrix C = nmatrix;
 	  int *C_end_pos = local_address;
+	  printf("1. Adress of C_end_pos is: %d\n", pos);
 	  C_end_pos += 4 + A_size + B_size;
+	  printf("2. Adress of C_end_pos is: %d\n", pos);
 	  memcpy(C.matrix, C_end_pos, C_size * sizeof(int));
       C.rows = A.rows;
       C.columns	= B.columns;
