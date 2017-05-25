@@ -469,13 +469,15 @@ int main(int argc, char **argv)
       MPI_Barrier(MPI_COMM_WORLD);
 	  
 	  matrix C = nmatrix;
+	  C.rows = A.rows;
+      C.columns	= B.columns;
 	  int *C_end_pos = local_address;
 	  printf("1. Adress of C_end_pos is: %p\n", C_end_pos);
 	  C_end_pos += 4 + A_size + B_size;
 	  printf("2. Adress of C_end_pos is: %p\n", C_end_pos);
+	  C.matrix = (int *) malloc(C.rows * C.columns * sizeof(int));
 	  memcpy(C.matrix, C_end_pos, C_size);
-      C.rows = A.rows;
-      C.columns	= B.columns;
+      
 	  
       time = MPI_Wtime() - time;
       printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
