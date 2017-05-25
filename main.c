@@ -453,7 +453,7 @@ int main(int argc, char **argv)
 	  printf("1. Adress of A_pos is: %p\n", A_pos);
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
 	  printf("2. Adress of A_pos is: %p\n", A_pos);
-	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
+	  
 	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns);
 	  printf("3. Adress of A_pos is: %p\n", A_pos);
       multiply_matrix(A_rest, B, &C_part);
