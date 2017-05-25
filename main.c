@@ -424,16 +424,22 @@ int main(int argc, char **argv)
       local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
 		
-      int *pos = local_address;	
+      int *pos = local_address;
+	  printf("1. Adress of pos is: %p\n", pos);
       local_address[0] = A.rows;
       local_address[1] = A.columns;
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
       memcpy(pos, A.matrix, A_size);
+	  printf("2. Adress of pos is: %p\n", pos);
       pos +=A_size;
+	  printf("3a. Adress of pos is: %p\n", pos);
+	  printf("3b. Adress of B_size is: %d\n", B_size);
       memcpy(pos, B.matrix, B_size);
+	  printf("3c. Adress of pos is: %p\n", pos);
       pos +=B_size;
+	  printf("4. Adress of pos is: %p\n", pos);
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -444,23 +450,30 @@ int main(int argc, char **argv)
 	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
 	  A_rest.columns = A.columns;
 	  int *A_pos = A.matrix;
+	  printf("1. Adress of A_pos is: %p\n", A_pos);
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
-	  
-	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns * sizeof(int));
-	   
+	  printf("2. Adress of A_pos is: %p\n", A_pos);
+	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
+	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns);
+	  printf("3. Adress of A_pos is: %p\n", A_pos);
       multiply_matrix(A_rest, B, &C_part);
+	  printf("4. Adress of A_pos is: %p\n", A_pos);
 	  
 	  int *C_pos = local_address;
+	  printf("1. Adress of C_pos is: %p\n", C_pos);
 	  C_pos += 4 + A_size + B_size;
+	  printf("2. Adress of C_pos is: %p\n", C_pos);
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
-       
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
+      printf("3. Adress of C_pos is: %p\n", C_pos);
       MPI_Barrier(MPI_COMM_WORLD);
 	  
 	  matrix C = nmatrix;
 	  int *C_end_pos = local_address;
+	  printf("1. Adress of C_end_pos is: %p\n", C_end_pos);
 	  C_end_pos += 4 + A_size + B_size;
-	  memcpy(C.matrix, C_end_pos, C_size * sizeof(int));
+	  printf("2. Adress of C_end_pos is: %p\n", C_end_pos);
+	  memcpy(C.matrix, C_end_pos, C_size);
       C.rows = A.rows;
       C.columns	= B.columns;
 	  
