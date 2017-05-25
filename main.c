@@ -430,9 +430,9 @@ int main(int argc, char **argv)
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
-      memcpy(pos, A.matrix, A_size);
+      memcpy(pos, A.matrix, A_size * sizeof(int));
       pos +=A_size;
-      memcpy(pos, B.matrix, B_size);
+      memcpy(pos, B.matrix, B_size * sizeof(int));
       pos +=B_size;
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
@@ -446,21 +446,21 @@ int main(int argc, char **argv)
 	  int *A_pos = A.matrix;
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
 	  
-	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns);
+	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns * sizeof(int));
 	   
       multiply_matrix(A_rest, B, &C_part);
 	  
 	  int *C_pos = local_address;
 	  C_pos += 4 + A_size + B_size;
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
        
       MPI_Barrier(MPI_COMM_WORLD);
 	  
 	  matrix C = nmatrix;
 	  int *C_end_pos = local_address;
 	  C_end_pos += 4 + A_size + B_size;
-	  memcpy(C.matrix, C_end_pos, C_size);
+	  memcpy(C.matrix, C_end_pos, C_size * sizeof(int));
       C.rows = A.rows;
       C.columns	= B.columns;
 	  
@@ -516,20 +516,20 @@ int main(int argc, char **argv)
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
 	  int testSize = ((node-1) * chunk_size * A.columns) + 4;
 	  printf("Node %d: and chunk_size: %d and A.columns: %d and Checkpoint 1C and testSize is %d\n", node, chunk_size, A.columns, &testSize);
-	  memcpy(A.matrix, A_pos, chunk_size * A.columns);
+	  memcpy(A.matrix, A_pos, chunk_size * A.columns * sizeof(int));
 	  printf("Checkpoint 1D\n");
 	  int *B_pos = remote_address;
 	  printf("Checkpoint 1E\n");
 	  B_pos += 4 + A.rows * A.columns;
 	  printf("Checkpoint 1F\n");
-	  memcpy(B.matrix, B_pos, B.rows * B.columns);
+	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
 	  printf("Checkpoint 2\n");
       multiply_matrix(A, B, &C_part);
 	  printf("Checkpoint 3\n");
 	  int *C_pos = remote_address;
 	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
 	  C_pos += (node-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
 	  printf("Checkpoint 4\n");
       MPI_Barrier(MPI_COMM_WORLD);
       free_matrix(&C_part);
