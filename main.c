@@ -511,17 +511,17 @@ int main(int argc, char **argv)
 	  
 	  int *A_pos = remote_address;
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
-	  memcpy(A->matrix, A_pos, chunk_size * A.columns);
+	  memcpy(A.matrix, A_pos, chunk_size * A.columns);
 	  int *B_pos = remote_address;
 	  B_pos += 4 + A.rows * A.columns;
-	  memcpy(B->matrix, B_pos, B.rows * B.columns);
+	  memcpy(B.matrix, B_pos, B.rows * B.columns);
 
       multiply_matrix(A, B, &C_part);
 	  
 	  int *C_pos = remote_address;
 	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
 	  C_pos += (node-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part, C_part.rows * C_part.columns);
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
 	  
       MPI_Barrier(MPI_COMM_WORLD);
       free_matrix(&C_part);
