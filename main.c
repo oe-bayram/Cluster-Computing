@@ -506,12 +506,17 @@ int main(int argc, char **argv)
 	  A.columns = remote_address[1];
 	  B.rows = remote_address[2];
 	  B.columns = remote_address[3];
-	  printf("Checkpoint 1");
+	  printf("Checkpoint 1A");
 	  int *A_pos = remote_address;
+	  printf("Checkpoint 1B");
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
+	  printf("Checkpoint 1C");
 	  memcpy(A.matrix, A_pos, chunk_size * A.columns);
+	  printf("Checkpoint 1D");
 	  int *B_pos = remote_address;
+	  printf("Checkpoint 1E");
 	  B_pos += 4 + A.rows * A.columns;
+	  printf("Checkpoint 1F");
 	  memcpy(B.matrix, B_pos, B.rows * B.columns);
 	  printf("Checkpoint 2");
       multiply_matrix(A, B, &C_part);
