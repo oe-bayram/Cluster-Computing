@@ -446,14 +446,14 @@ int main(int argc, char **argv)
 	  int *A_pos = A.matrix;
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
 	  
-	  memcpy(A_rest->matrix, A_pos, chunk_size * A.columns);
+	  memcpy(A_rest.matrix, A_pos, chunk_size * A.columns);
 	   
       multiply_matrix(A_rest, B, &C_part);
 	  
 	  int *C_pos = local_address;
 	  C_pos += 4 + A_size + B_size;
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part, C_part.rows * C_part.columns);
+	  memcpy(C_pos, C_part->matrix, C_part.rows * C_part.columns);
        
       MPI_Barrier(MPI_COMM_WORLD);
 	  
