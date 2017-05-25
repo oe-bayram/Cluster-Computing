@@ -515,7 +515,7 @@ int main(int argc, char **argv)
 	  printf("Checkpoint 1B\n");
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
 	  int testSize = (node-1) * chunk_size * A.columns + 4;
-	  printf("Node %d: Checkpoint 1C\n and testSize is %d", node, &testSize);
+	  printf("Node %d: and chunk_size: %d and A.columns: %d and Checkpoint 1C and testSize is %d\n", node, chunk_size, A.columns, &testSize);
 	  memcpy(A.matrix, A_pos, chunk_size * A.columns);
 	  printf("Checkpoint 1D\n");
 	  int *B_pos = remote_address;
