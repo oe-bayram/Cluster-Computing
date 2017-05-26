@@ -427,13 +427,24 @@ int main(int argc, char **argv)
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
 		
       int *pos = local_address;
+	  printf("Value of local_address: %d\n", local_address);
+	  printf("Size of local_address: %d\n", sizeof(local_address));
+	  printf("Value of pos: %d\n", pos);
+	  printf("Size of pos: %d\n", sizeof(pos));
       local_address[0] = A.rows;
+	  printf("Value of local_address[0]: %d\n", local_address[0]);
+	  printf("1. Value of pos[0]: %d\n", pos[0]);
       local_address[1] = A.columns;
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
+	  printf("Value of local_address[4]: %d\n", local_address[4]);
+	  printf("2. Value of pos[0]: %d\n", pos[0]);
       memcpy(pos, A.matrix, A_size * sizeof(int));
+	  printf("Value of A_size: %d\n", A_size);
+	  printf("Value of A_size * sizeof(int): %d\n", A_size * sizeof(int));
       pos +=A_size;
+	  printf("Value of pos: %d\n", pos);
       memcpy(pos, B.matrix, B_size * sizeof(int));
       pos +=B_size;
 
