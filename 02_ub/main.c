@@ -443,7 +443,7 @@ int main(int argc, char **argv)
       free_matrix(&C);
    } else {
       
-      free_matrix(&C_part);
+      
    }
 
    //printf("node: %d finalize\n", node);
