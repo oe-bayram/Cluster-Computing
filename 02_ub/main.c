@@ -436,7 +436,7 @@ int main(int argc, char **argv)
       pos +=A_size;
       memcpy(pos, B.matrix, B_size * sizeof(int));
 	  int counter;
-	  for(counter = 0; counter<1120;counter++){
+	  for(counter = 0; counter<120;counter++){
 		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
 	  }
  
