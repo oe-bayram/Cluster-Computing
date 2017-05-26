@@ -425,21 +425,15 @@ int main(int argc, char **argv)
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
 		
       int *pos = local_address;
-	  printf("1. Adress of pos is: %p\n", pos);
       local_address[0] = A.rows;
       local_address[1] = A.columns;
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
       memcpy(pos, A.matrix, A_size);
-	  printf("2. Adress of pos is: %p\n", pos);
       pos +=A_size;
-	  printf("3a. Adress of pos is: %p\n", pos);
-	  printf("3b. Adress of B_size is: %d\n", B_size);
       memcpy(pos, B.matrix, B_size);
-	  printf("3c. Adress of pos is: %p\n", pos);
       pos +=B_size;
-	  printf("4. Adress of pos is: %p\n", pos);
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -450,31 +444,24 @@ int main(int argc, char **argv)
 	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
 	  A_rest.columns = A.columns;
 	  int *A_pos = A.matrix;
-	  printf("1. Adress of A_pos is: %p\n", A_pos);
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
-	  printf("2. Adress of A_pos is: %p\n", A_pos);
 	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
 	  memcpy(A_rest.matrix, A_pos, A_rest.rows * A.columns);
-	  printf("3. Adress of A_pos is: %p\n", A_pos);
       multiply_matrix(A_rest, B, &C_part);
-	  printf("4. Adress of A_pos is: %p\n", A_pos);
+	  printf("Node: %d: Printing matrix A_rest\n", node);
+	  print_matrix(A_rest);
 	  
 	  int *C_pos = local_address;
-	  printf("1. Adress of C_pos is: %p\n", C_pos);
 	  C_pos += 4 + A_size + B_size;
-	  printf("2. Adress of C_pos is: %p\n", C_pos);
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
-      printf("3. Adress of C_pos is: %p\n", C_pos);
       MPI_Barrier(MPI_COMM_WORLD);
 	  
 	  matrix C = nmatrix;
 	  C.rows = A.rows;
       C.columns	= B.columns;
 	  int *C_end_pos = local_address;
-	  printf("1. Adress of C_end_pos is: %p\n", C_end_pos);
 	  C_end_pos += 4 + A_size + B_size;
-	  printf("2. Adress of C_end_pos is: %p\n", C_end_pos);
 	  C.matrix = (int *) malloc(C.rows * C.columns * sizeof(int));
 	  memcpy(C.matrix, C_end_pos, C_size);
       time = MPI_Wtime() - time;
@@ -516,36 +503,27 @@ int main(int argc, char **argv)
 	  
 	  int chunk_size = ceil(remote_address[0] / comm_size);
 	  A.rows = chunk_size;
-	  printf("A.rows size: %d\n", A.rows);
 	  A.columns = remote_address[1];
-	  printf("A.columns size: %d\n", A.columns);
 	  B.rows = remote_address[2];
-	  printf("B.rows size: %d\n", B.rows);
 	  B.columns = remote_address[3];
-	  printf("B.columns size: %d\n", B.columns);
-	  printf("Checkpoint 1A\n");
 	  int *A_pos = remote_address;
-	  printf("Checkpoint 1B\n");
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
 	  int testSize = ((node-1) * chunk_size * A.columns) + 4;
-	  printf("Node %d: and chunk_size: %d and A.columns: %d and Checkpoint 1C and testSize is %d\n", node, chunk_size, A.columns, &testSize);
 	  A.matrix = (int *) malloc(A.rows * A.columns * sizeof(int));
 	  memcpy(A.matrix, A_pos, A.rows * A.columns);
-	  printf("Checkpoint 1D\n");
 	  int *B_pos = remote_address;
-	  printf("Checkpoint 1E\n");
 	  B_pos += 4 + A.rows * A.columns;
-	  printf("Checkpoint 1F\n");
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
 	  memcpy(B.matrix, B_pos, B.rows * B.columns);
-	  printf("Checkpoint 2\n");
+	  printf("Node: %d: Printing matrix A\n", node);
+	  print_matrix(A);
+	  printf("Node: %d: Printing matrix B\n", node);
+	  print_matrix(B);
       multiply_matrix(A, B, &C_part);
-	  printf("Checkpoint 3\n");
 	  int *C_pos = remote_address;
 	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
 	  C_pos += (node-1) * chunk_size * B.columns;
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
-	  printf("Checkpoint 4\n");
       MPI_Barrier(MPI_COMM_WORLD);
       free_matrix(&C_part);
    }
