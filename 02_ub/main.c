@@ -435,17 +435,64 @@ int main(int argc, char **argv)
       memcpy(pos, A.matrix, A_size * sizeof(int));
       pos +=A_size;
       memcpy(pos, B.matrix, B_size * sizeof(int));
-	  pos = local_address;
+      pos = local_address;
 	  int counter;
 	  for(counter = 0; counter<120;counter++){
 		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
 	  }
- 
+		
+      SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
+
+      // send segment information to other nodes
+      MPI_Bcast(&local_node_id, 1, MPI_INT, node, MPI_COMM_WORLD);
+
+	  int chunk_size = ceil(A.rows / comm_size);
+	  printf("1. chunk_size is: %d\n", chunk_size);
+	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
+	  printf("2. A_rest.rows is: %d\n", A_rest.rows);
+	  A_rest.columns = A.columns;
+	  printf("2. A_rest.columns is: %d\n", A_rest.columns);
+	  
+	  int *A_pos = A.matrix;
+	  printf("0. Size of A.matrix: %d\n", sizeof(A.matrix));
+	  printf("1. Position of A_pos: %d\n", A_pos);
+	  A_pos += (comm_size-1) * chunk_size * A.columns;
+	  printf("2. Value of multiplication: %d\n", (comm_size-1) * chunk_size * A.columns);
+	  printf("3. Position of A_pos: %d\n", A_pos);
+	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
+	  memcpy(A_rest.matrix, A_pos, A_rest.rows * A.columns * sizeof(int));
+	  
+      multiply_matrix(A_rest, B, &C_part);
+	  printf("Node: %d: Printing matrix A_rest\n", node);
+	  print_matrix(A_rest);
+	  printf("Node: %d: Printing matrix C_part\n", node);
+	  print_matrix(C_part);
+	  
+	  
+	  printf("Node: %d: matrix A_rest printed\n", node);
+	  int *C_pos = local_address;
+	  C_pos += 4 + A_size + B_size;
+	  C_pos += (comm_size-1) * chunk_size * B.columns;
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
+      MPI_Barrier(MPI_COMM_WORLD);
+	  
+	  matrix C = nmatrix;
+	  C.rows = A.rows;
+      C.columns	= B.columns;
+	  int *C_end_pos = local_address;
+	  C_end_pos += 4 + A_size + B_size;
+	  C.matrix = (int *) malloc(C.rows * C.columns * sizeof(int));
+	  memcpy(C.matrix, C_end_pos, C_size * sizeof(int));
+      time = MPI_Wtime() - time;
+      printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
+      print_matrix(C);
+	      
+      write_matrix(argv[3], C);
+
       free_matrix(&A_rest);
       free_matrix(&C_part);
       free_matrix(&C);
    } else {
-      
       
    }
 
