@@ -444,7 +444,11 @@ int main(int argc, char **argv)
 	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
 	  A_rest.columns = A.columns;
 	  int *A_pos = A.matrix;
+	  printf("0. Size of A.matrix: %d\n", sizeof(A.matrix));
+	  printf("1. Position of A_pos: %d\n", A_pos);
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
+	  printf("2. Value of multiplication: %d\n", (comm_size-1) * chunk_size * A.columns);
+	  printf("3. Position of A_pos: %d\n", A_pos);
 	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
 	  memcpy(A_rest.matrix, A_pos, A_rest.rows * A.columns * sizeof(int));
       multiply_matrix(A_rest, B, &C_part);
