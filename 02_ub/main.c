@@ -446,7 +446,7 @@ int main(int argc, char **argv)
 	  int *A_pos = A.matrix;
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
 	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
-	  memcpy(A_rest.matrix, A_pos, A_rest.rows * A.columns);
+	  memcpy(A_rest.matrix, A_pos, A_rest.rows * A.columns * sizeof(int));
       multiply_matrix(A_rest, B, &C_part);
 	  printf("Node: %d: Printing matrix A_rest\n", node);
 	  print_matrix(A_rest);
@@ -463,7 +463,7 @@ int main(int argc, char **argv)
 	  int *C_end_pos = local_address;
 	  C_end_pos += 4 + A_size + B_size;
 	  C.matrix = (int *) malloc(C.rows * C.columns * sizeof(int));
-	  memcpy(C.matrix, C_end_pos, C_size);
+	  memcpy(C.matrix, C_end_pos, C_size * sizeof(int));
       time = MPI_Wtime() - time;
       printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
       print_matrix(C);
@@ -510,11 +510,11 @@ int main(int argc, char **argv)
 	  A_pos += (node-1) * chunk_size * A.columns + 4;
 	  int testSize = ((node-1) * chunk_size * A.columns) + 4;
 	  A.matrix = (int *) malloc(A.rows * A.columns * sizeof(int));
-	  memcpy(A.matrix, A_pos, A.rows * A.columns);
+	  memcpy(A.matrix, A_pos, A.rows * A.columns * sizeof(int));
 	  int *B_pos = remote_address;
 	  B_pos += 4 + A.rows * A.columns;
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
-	  memcpy(B.matrix, B_pos, B.rows * B.columns);
+	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
 	  printf("Node: %d: Printing matrix A\n", node);
 	  print_matrix(A);
 	  printf("Node: %d: Printing matrix B\n", node);
