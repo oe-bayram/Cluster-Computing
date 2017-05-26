@@ -389,8 +389,10 @@ int main(int argc, char **argv)
       sci_map_t local_map;
 		printf("Reading matrix A\n");
       read_matrix(argv[1], &A);
+	  print_matrix(A);
 	  printf("Reading matrix B\n");
       read_matrix(argv[2], &B);
+	  print_matrix(B);
        printf("Building A_rest and C_part\n");
       matrix A_rest 	= nmatrix;
       matrix C_part 	= nmatrix;
