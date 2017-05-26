@@ -427,36 +427,19 @@ int main(int argc, char **argv)
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
 		
       int *pos = local_address;
-	  printf("Value of local_address: %d\n", local_address);
-	  printf("Size of local_address: %d\n", sizeof(local_address));
-	  printf("Value of pos: %d\n", pos);
-	  printf("Size of pos: %d\n", sizeof(pos));
       local_address[0] = A.rows;
-	  printf("Value of local_address[0]: %d\n", local_address[0]);
-	  printf("1. Value of pos[0]: %d\n", pos[0]);
       local_address[1] = A.columns;
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
-	  printf("Value of local_address[4]: %d\n", local_address[4]);
       memcpy(pos, A.matrix, A_size * sizeof(int));
-	  printf("2. Value of pos[0]: %d\n", pos[0]);
-	  printf("3. Value of pos[1]: %d\n", pos[1]);
-	  printf("4. Value of pos[2]: %d\n", pos[2]);
-	  printf("5. Value of pos[3]: %d\n", pos[3]);
-	  printf("6. Value of pos[4]: %d\n", pos[4]);
-	  printf("7. Value of pos[5]: %d\n", pos[5]);
-	  printf("8. Value of pos[6]: %d\n", pos[6]);
-	  printf("9. Value of pos[7]: %d\n", pos[7]);
-	  printf("10. Value of pos[8]: %d\n", pos[8]);
-	  printf("Value of A_size: %d\n", A_size);
-	  printf("Value of A_size * sizeof(int): %d\n", A_size * sizeof(int));
       pos +=A_size;
-	  printf("Value of pos: %d\n", pos);
       memcpy(pos, B.matrix, B_size * sizeof(int));
-      pos +=B_size;
-
-	  
+	  int counter;
+	  for(counter = 0; counter<1120;counter++){
+		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
+	  }
+ 
       free_matrix(&A_rest);
       free_matrix(&C_part);
       free_matrix(&C);
