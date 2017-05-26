@@ -450,7 +450,7 @@ int main(int argc, char **argv)
       multiply_matrix(A_rest, B, &C_part);
 	  printf("Node: %d: Printing matrix A_rest\n", node);
 	  print_matrix(A_rest);
-	  
+	  printf("Node: %d: matrix A_rest printed\n", node);
 	  int *C_pos = local_address;
 	  C_pos += 4 + A_size + B_size;
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
@@ -503,6 +503,7 @@ int main(int argc, char **argv)
 	  
 	  int chunk_size = ceil(remote_address[0] / comm_size);
 	  A.rows = chunk_size;
+	  printf("chunk_size is: %d:\n", chunk_size);
 	  A.columns = remote_address[1];
 	  B.rows = remote_address[2];
 	  B.columns = remote_address[3];
