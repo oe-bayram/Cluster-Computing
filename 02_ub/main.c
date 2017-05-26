@@ -439,6 +439,7 @@ int main(int argc, char **argv)
       local_address[3] = B.columns;
       pos +=4;
 	  printf("Value of local_address[4]: %d\n", local_address[4]);
+      memcpy(pos, A.matrix, A_size * sizeof(int));
 	  printf("2. Value of pos[0]: %d\n", pos[0]);
 	  printf("3. Value of pos[1]: %d\n", pos[1]);
 	  printf("4. Value of pos[2]: %d\n", pos[2]);
@@ -447,7 +448,7 @@ int main(int argc, char **argv)
 	  printf("7. Value of pos[5]: %d\n", pos[5]);
 	  printf("8. Value of pos[6]: %d\n", pos[6]);
 	  printf("9. Value of pos[7]: %d\n", pos[7]);
-      memcpy(pos, A.matrix, A_size * sizeof(int));
+	  printf("10. Value of pos[8]: %d\n", pos[8]);
 	  printf("Value of A_size: %d\n", A_size);
 	  printf("Value of A_size * sizeof(int): %d\n", A_size * sizeof(int));
       pos +=A_size;
