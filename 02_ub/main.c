@@ -432,19 +432,11 @@ int main(int argc, char **argv)
       local_address[2] = B.rows;
       local_address[3] = B.columns;
       pos +=4;
-	  int counter;
-	  for(counter = 0; counter<120;counter++){
-		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
-	  }
       memcpy(pos, A.matrix, A_size * sizeof(int));
-	  for(counter = 0; counter<120;counter++){
-		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
-	  }
       pos +=A_size;
-	  for(counter = 0; counter<120;counter++){
-		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
-	  }
       memcpy(pos, B.matrix, B_size * sizeof(int));
+	  pos = local_address;
+	  int counter;
 	  for(counter = 0; counter<120;counter++){
 		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
 	  }
