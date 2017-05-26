@@ -467,13 +467,15 @@ int main(int argc, char **argv)
 	  print_matrix(A_rest);
 	  printf("Node: %d: Printing matrix C_part\n", node);
 	  print_matrix(C_part);
-	  
-	  
 	  printf("Node: %d: matrix A_rest printed\n", node);
 	  int *C_pos = local_address;
 	  C_pos += 4 + A_size + B_size;
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns);
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
+	  pos = local_address;
+	  for(counter = 0; counter<120;counter++){
+		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
+	  }
       MPI_Barrier(MPI_COMM_WORLD);
 	  
 	  matrix C = nmatrix;
