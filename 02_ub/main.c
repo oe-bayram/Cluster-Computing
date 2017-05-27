@@ -361,8 +361,8 @@ void read_matrix_segment(int *segment, matrix *A, int position)
 {
 	int *A_pos = segment;
 	A_pos += position;
-	A.matrix = (int *) malloc(A.rows * A.columns * sizeof(int));
-	memcpy(A.matrix, A_pos, A.rows * A.columns * sizeof(int));
+	A->matrix = (int *) malloc(A->rows * A->columns * sizeof(int));
+	memcpy(A->matrix, A_pos, A->rows * A->columns * sizeof(int));
 }
 
 /*
