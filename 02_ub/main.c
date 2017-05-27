@@ -517,7 +517,7 @@ int main(int argc, char **argv)
 	  int position = (node-1) * A.rows * A.columns + 4; // set position to matrix A depending on node id (chunk_size)
 	  read_matrix_segment(remote_address, &A, position);
 	  
-	  int position = remote_address[0] * remote_address[1] + 4; // set position to beginning of matrix B
+	  position = remote_address[0] * remote_address[1] + 4; // set position to beginning of matrix B
 	  read_matrix_segment(remote_address, &B, position);
 	  
 	  printf("Node %d has this part of matrix A: \n", error);
