@@ -282,9 +282,10 @@ void multiply_matrix(matrix A, matrix B, matrix *C)
 	    printf("%d: %d,%d ", i,  A_index, B_index);
 
 	    value += A.matrix[A_index] * B.matrix[B_index];
-		printf("Multiplying values: %d and %d\n", A.matrix[A_index], B.matrix[B_index);
+		printf("Multiplying values: %d and %d\n", A.matrix[A_index], B.matrix[B_index]);
 		printf("Value now: %d\n", value);
 	}
+	
 	printf("Result Value is: %d\n", value);
 	C->matrix[C_index] = value;
 	printf("\n");
