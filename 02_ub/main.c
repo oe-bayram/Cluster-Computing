@@ -403,7 +403,7 @@ int main(int argc, char **argv)
 	  position = remote_address[0] * remote_address[1] + 4; // set position to beginning of matrix B
 	  read_matrix_segment(remote_address, &B, position);
 	  
-	  printf("Node %d has this part of matrix A: \n", error);
+	  printf("Node %d has this part of matrix A: \n", node);
 	  print_matrix(A);
 	  
 	  matrix C_part = nmatrix;
