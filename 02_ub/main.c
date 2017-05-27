@@ -284,7 +284,7 @@ void multiply_matrix(matrix A, matrix B, matrix *C)
 	    value += A.matrix[A_index] * B.matrix[B_index];
 		printf("Value now: %d\n", value);
 	}
-
+	printf("Result Value is: %d\n", value);
 	C->matrix[C_index] = value;
 	printf("\n");
     }
