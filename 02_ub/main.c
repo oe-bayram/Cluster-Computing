@@ -33,7 +33,6 @@ struct matrix_s
 
 typedef struct matrix_s matrix;
 
-
 /*
     read_matrix(filename, *A)
     reads a matrix from file <filename> and fills the content into the A matrix struct:
@@ -133,121 +132,6 @@ void free_matrix(matrix *A)
 	return;
 
     free(A->matrix);
-}
-
-/*
-    send_matrix_partts(A, B, *A_rest, comm_size)
-    Distribute matrix parts over the nodes
-    Matrix B is send to every Node.
-    Each Node receives a different part of A
-    *A_rest gives the rest back to be processed by the root node
-    1- define chunk size
-    2- send matrix information to worker (row/column size)
-    3- partition A and send to worker
-    4- send B
-    5- populate *A_rest
-*/
-void send_matrix_parts(matrix A, matrix B, matrix *A_rest, int comm_size)
-{
-    int chunk_size = ceil(A.rows / comm_size);
-
-    MPI_Request request;
-    int buffer[INFO_BUFFER];
-    buffer[0] = chunk_size;
-    buffer[1] = A.columns;
-    buffer[2] = B.rows;
-    buffer[3] = B.columns;
-
-    int worker;
-    int *A_pos = A.matrix;
-    for(worker = 1; worker < comm_size; worker++)
-    {
-	MPI_Isend(buffer, INFO_BUFFER, MPI_INT, worker, MATRIX_INFO, MPI_COMM_WORLD, 
-		&request);
-
-        MPI_Isend(A_pos, chunk_size * A.columns, MPI_INT, worker, MATRIX_A, 
-		MPI_COMM_WORLD, &request);
-
-	MPI_Isend(B.matrix, B.rows * B.columns, MPI_INT, worker, MATRIX_B,
-		MPI_COMM_WORLD, &request);
-
-	A_pos += chunk_size * A.columns;
-    }
-
-    int A_rest_size = (A.matrix + (A.rows * A.columns)) - A_pos;
-    //printf("rest size : %d", A_rest_size);
-    A_rest->columns 	= A.columns;
-    A_rest->rows 	= A_rest_size / A_rest->columns;
-    A_rest->matrix 	= (int *) malloc(A_rest_size * sizeof(int));
-    memcpy(A_rest->matrix, A_pos, A_rest_size * sizeof(int));
-    
-}
-
-/*
-    recv_matrix_parts(A, B)
-    receive the chunk of matrix A, and the full matrix B from the master node
-    1-receive matrix info for A and B
-    2-initialize A and B
-    3-receive A
-    4-receive B
-*/
-
-void recv_matrix_parts(matrix *A, matrix *B)
-{
-   int buffer[INFO_BUFFER];
-   MPI_Status status;
-   MPI_Recv(buffer, INFO_BUFFER, MPI_INT, 0, MATRIX_INFO, MPI_COMM_WORLD, &status);
-       
-   //printf("A: %d x %d, B: %d x %d\n", buffer[0], buffer[1], buffer[2], buffer[3]);
-
-   A->rows 	= buffer[0];
-   A->columns 	= buffer[1];
-   int A_size	= A->rows * A->columns;
-   A->matrix	= (int *) malloc(A_size * sizeof(int));
-   B->rows 	= buffer[2];
-   B->columns 	= buffer[3];
-   int B_size	= B->rows * B->columns;
-   B->matrix	= (int *) malloc(B_size * sizeof(int));
-
-   MPI_Recv(A->matrix, A_size , MPI_INT, 0, MATRIX_A, MPI_COMM_WORLD, &status);
-   MPI_Recv(B->matrix, B_size , MPI_INT, 0, MATRIX_B, MPI_COMM_WORLD, &status);
-
-}
-
-/*
-    send_matrix_result(C_part)
-    send the result to the root node
-*/
-
-void send_matrix_result(matrix C_part)
-{
-    MPI_Send(C_part.matrix, C_part.rows * C_part.columns, MPI_INT, 0, MATRIX_C, MPI_COMM_WORLD);
-}
-
-/*
-    recv_build_matrix(C_part, *C, comm_size)
-    receive parts of the result matrix C from non root-nodes
-    1-foreach worker
-        1.1-receive C_part
-        1.2-insert C_part in to C
-    2-insert own C_part in to C
-*/
-void recv_build_matrix(matrix C_part, matrix *C, int comm_size)
-{
-    MPI_Status status;
-    int worker;
-    int *C_pos;
-    int part_size 	= ceil(C->rows / comm_size) * C->columns;
-    int C_size 		= C->rows * C->columns;
-    C->matrix 		= (int *) malloc(C_size * sizeof(int));
-
-    for(worker = 1, C_pos = C->matrix; worker < comm_size; worker++, C_pos += part_size)
-    {
-	MPI_Recv(C_pos, part_size, MPI_INT, worker, MATRIX_C, MPI_COMM_WORLD, &status);
-    }
-
-    memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
-    
 }
 
 /*
@@ -494,7 +378,7 @@ int main(int argc, char **argv)
       MPI_Status status;
       MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-      printf("%d: received master_node_id: %d\n", node, master_node_id);
+      //printf("%d: received master_node_id: %d\n", node, master_node_id);
 
       SCIConnectSegment(v_dev, &remote_segment, master_node_id, SEGMENT_ID, ADAPTER_NO,
 		    NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
