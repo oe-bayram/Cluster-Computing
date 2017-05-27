@@ -346,9 +346,10 @@ int main(int argc, char **argv)
 	  int position = (comm_size-1) * chunk_size * A.columns + 4; // set position to beginning of matrix C
 	  read_matrix_segment(local_address, &A_rest, position);
 	  
-      multiply_matrix(A_rest, B, &C_part);
+	  printf("Node %d has this part of matrix A: \n", node);
 	  print_matrix(A_rest);
-	  print_matrix(C_part);
+	  
+      multiply_matrix(A_rest, B, &C_part);
 
 	  write_result_segment(local_address, C_part, comm_size, comm_size);
 	  
