@@ -273,22 +273,18 @@ void multiply_matrix(matrix A, matrix B, matrix *C)
 	int row 	= C_index / C->columns;
 	int column 	= C_index - (row * C->columns);
 
-	printf("row: %d, column: %d\n", row, column);
+	//printf("row: %d, column: %d\n", row, column);
 	for(i = 0; i < A.columns; i++)
 	{
 	    
 	    int A_index = row * A.columns + i;
 	    int B_index = i * B.columns + column;
-	    printf("%d: %d,%d ", i,  A_index, B_index);
+	    //printf("%d: %d,%d ", i,  A_index, B_index);
 
 	    value += A.matrix[A_index] * B.matrix[B_index];
-		printf("Multiplying values: %d and %d\n", A.matrix[A_index], B.matrix[B_index]);
-		printf("Value now: %d\n", value);
 	}
-	
-	printf("Result Value is: %d\n", value);
 	C->matrix[C_index] = value;
-	printf("\n");
+	//printf("\n");
     }
 }
 
@@ -527,7 +523,6 @@ int main(int argc, char **argv)
 	  
 	  int chunk_size = ceil(remote_address[0] / comm_size);
 	  A.rows = chunk_size;
-	  printf("chunk_size is: %d:\n", chunk_size);
 	  A.columns = remote_address[1];
 	  B.rows = remote_address[2];
 	  B.columns = remote_address[3];
@@ -540,9 +535,7 @@ int main(int argc, char **argv)
 	  B_pos += 4 + remote_address[0] * remote_address[1];
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
 	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
-	  printf("Node: %d: Printing matrix A\n", node);
 	  print_matrix(A);
-	  printf("Node: %d: Printing matrix B\n", node);
 	  print_matrix(B);
       multiply_matrix(A, B, &C_part);
 	  int *C_pos = remote_address;
