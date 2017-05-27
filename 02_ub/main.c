@@ -327,7 +327,7 @@ void write_matrix(char * filename, matrix C)
     write_matrix_segment(local_address, A, B)
     write matrixes A and B to a segment
 */
-void write_matrix_segment(int segment, matrix A, matrix B)
+void write_matrix_segment(int *segment, matrix A, matrix B)
 {
 	int *pos = segment;
 	segment[0] = A.rows;
@@ -339,6 +339,7 @@ void write_matrix_segment(int segment, matrix A, matrix B)
 	pos += A.rows * A.columns;
 	memcpy(pos, B.matrix, B.rows * B.columns * sizeof(int));
 }
+
 
 /*
     main
