@@ -433,15 +433,8 @@ int main(int argc, char **argv)
 
       printf("start calculation\n");
       double time = MPI_Wtime();
-
-      // send_matrix_parts(A, B, &A_rest, comm_size);
-      int A_size = A.columns * A.rows;
-      int B_size = B.columns * B.rows;
-      int C_size = B.columns * A.rows;
-      C.rows = A.rows;
-      C.columns = B.columns;
 	   
-      unsigned int SEGMENT_SIZE = A_size+B_size+C_size+4;
+      unsigned int SEGMENT_SIZE = A.columns * A.rows+B.columns * B.rows+B.columns * A.rows+4;
 	   
       printf("prepare segment: %d \n", SEGMENT_SIZE);
 	   
@@ -479,13 +472,12 @@ int main(int argc, char **argv)
 	  
       MPI_Barrier(MPI_COMM_WORLD);
 	  
-	  matrix C = nmatrix;
 	  C.rows = A.rows;
       C.columns	= B.columns;
-	  int *C_end_pos = local_address;
-	  C_end_pos += 4 + A_size + B_size;
-	  C.matrix = (int *) malloc(C_size * sizeof(int));
-	  memcpy(C.matrix, C_end_pos, C_size * sizeof(int));
+	  
+	  int position = A.rows * A.columns + B.rows * B.columns + 4; // set position to beginning of matrix C
+	  read_matrix_segment(local_address, &C, position);
+	  
       time = MPI_Wtime() - time;
       printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
       print_matrix(C);
@@ -496,8 +488,6 @@ int main(int argc, char **argv)
       free_matrix(&C_part);
       free_matrix(&C);
    } else {
-      matrix C_part = nmatrix;
-      //recv_matrix_parts(&A, &B);
       unsigned int master_node_id;
       sci_remote_segment_t remote_segment;
       sci_map_t remote_map;
@@ -506,7 +496,7 @@ int main(int argc, char **argv)
       MPI_Status status;
       MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-      printf("received master_node_id: %d\n", master_node_id);
+      printf("%d: received master_node_id: %d\n", node, master_node_id);
 
       SCIConnectSegment(v_dev, &remote_segment, master_node_id, SEGMENT_ID, ADAPTER_NO,
 		    NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
@@ -519,23 +509,21 @@ int main(int argc, char **argv)
       remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
 		&remote_map, 0, segment_size, 0, NO_FLAGS, &error);
 
-      printf("Node: %d, first two array value: %d, %d\n", local_node_id,
-      remote_address[0], remote_address[1]);
-	  
-	  A.rows = ceil(remote_address[0] / comm_size);
+	  A.rows = ceil(remote_address[0] / comm_size); // chunk_size
 	  A.columns = remote_address[1];
 	  B.rows = remote_address[2];
 	  B.columns = remote_address[3];
 
-	  int position = (node-1) * A.rows * A.columns + 4;
+	  int position = (node-1) * A.rows * A.columns + 4; // set position to matrix A depending on node id (chunk_size)
 	  read_matrix_segment(remote_address, &A, position);
 	  
-	  int *B_pos = remote_address;
-	  B_pos += 4 + remote_address[0] * remote_address[1];
-	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
-	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
+	  int position = remote_address[0] * remote_address[1] + 4; // set position to beginning of matrix B
+	  read_matrix_segment(remote_address, &B, position);
 	  
+	  printf("Node %d has this part of matrix A: \n", error);
 	  print_matrix(A);
+	  
+	  matrix C_part = nmatrix;
       multiply_matrix(A, B, &C_part);
 	  write_result_segment(remote_address, C_part, comm_size, node);
 	  
