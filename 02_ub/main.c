@@ -256,7 +256,7 @@ void recv_build_matrix(matrix C_part, matrix *C, int comm_size)
     basic matrix multiplication of A and B, result in C
 */
 
-void multiply_matrix(matrix A, matrix B, matrix *C)
+void multiply_matrix(matrix A, matrix B, matrix *C, int start_row)
 {
     C->rows 	= A.rows;
     C->columns 	= B.columns;
@@ -274,19 +274,20 @@ void multiply_matrix(matrix A, matrix B, matrix *C)
 	int row 	= C_index / C->columns;
 	int column 	= C_index - (row * C->columns);
 
-	//printf("row: %d, column: %d\n", row, column);
+	printf("row: %d, column: %d\n", row, column);
 	for(i = 0; i < A.columns; i++)
 	{
 	    
 	    int A_index = row * A.columns + i;
 	    int B_index = i * B.columns + column;
-	    //printf("%d: %d,%d ", i,  A_index, B_index);
+	    printf("%d: %d,%d ", i,  A_index, B_index);
 
 	    value += A.matrix[A_index] * B.matrix[B_index];
+		printf("Value now: %d\n", value);
 	}
 
 	C->matrix[C_index] = value;
-	//printf("\n");
+	printf("\n");
     }
 }
 
