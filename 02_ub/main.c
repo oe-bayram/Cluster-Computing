@@ -250,13 +250,12 @@ void recv_build_matrix(matrix C_part, matrix *C, int comm_size)
     
 }
 
-
 /*
     multiply_matrix(A, B, *C)
     basic matrix multiplication of A and B, result in C
 */
 
-void multiply_matrix(matrix A, matrix B, matrix *C, int start_row)
+void multiply_matrix(matrix A, matrix B, matrix *C)
 {
     C->rows 	= A.rows;
     C->columns 	= B.columns;
