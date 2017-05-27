@@ -341,13 +341,15 @@ void write_raw_matrix_segment(int *segment, matrix A, matrix B)
 }
 
 /*
-    write_result_segment(segment, position, C, node_id)
+    write_result_segment(segment, C, comm_size, node_id)
     write result (matrix C) to segment
 */
-void write_result_segment(int *segment, int position, matrix C, int node_id)
+void write_result_segment(int *segment, matrix C, int comm_size, int node_id)
 {
+	int chunk_size = ceil(segment[0] / comm_size);
 	int *C_pos = segment;
-	C_pos += position;
+	C_pos += 4 + segment[0] * segment[1] + segment[2] * segment[3]; // set position to begin of segment part for C
+	C_pos += (node_id-1) * chunk_size * segment[3]; // set position depending on calculated part
 	memcpy(C_pos, C.matrix, C.rows * C.columns * sizeof(int));
 }
 
@@ -460,10 +462,8 @@ int main(int argc, char **argv)
       multiply_matrix(A_rest, B, &C_part);
 	  print_matrix(A_rest);
 	  print_matrix(C_part);
-	  
-	  int position = 4 + A_size + B_size; // set position to begin of segment part for C
-	  position += (comm_size-1) * chunk_size * B.columns; // set position depending on calculated part
-	  write_result_segment(local_address, position, C_part, comm_size-1);
+
+	  write_result_segment(local_address, C_part, comm_size, comm_size);
 	  
       MPI_Barrier(MPI_COMM_WORLD);
 	  
@@ -525,11 +525,8 @@ int main(int argc, char **argv)
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
 	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
 	  print_matrix(A);
-      multiply_matrix(A, B, &C_part);
-	  int *C_pos = remote_address;
-	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
-	  C_pos += (node-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
+	  write_result_segment(remote_address, C_part, comm_size, node);
+	  
       MPI_Barrier(MPI_COMM_WORLD);
       free_matrix(&C_part);
    }
