@@ -372,25 +372,21 @@ int main(int argc, char **argv)
    query.localAdapterNo = ADAPTER_NO;
    query.data = &local_node_id;
    SCIQuery(SCI_Q_ADAPTER, &query, NO_FLAGS, &error);
-   printf("got node id\n");
-   printf("Node ID: %d and Local Node id: %d\n", node, local_node_id);
 
    matrix A = nmatrix;
    matrix B = nmatrix;
    matrix C = nmatrix;
    
    if(node == 0) {
-	   printf("I am node 0 %d \n", local_node_id);
       sci_local_segment_t local_segment;
       int *local_address;
       sci_map_t local_map;
-		printf("Reading matrix A\n");
+      printf("Reading matrix A\n");
       read_matrix(argv[1], &A);
 	  print_matrix(A);
 	  printf("Reading matrix B\n");
       read_matrix(argv[2], &B);
 	  print_matrix(B);
-       printf("Building A_rest and C_part\n");
       matrix A_rest 	= nmatrix;
       matrix C_part 	= nmatrix;
 
@@ -399,11 +395,8 @@ int main(int argc, char **argv)
 
       // send_matrix_parts(A, B, &A_rest, comm_size);
       int A_size = A.columns * A.rows;
-	  printf("A_size: %d \n", A_size);
       int B_size = B.columns * B.rows;
-	  printf("B_size: %d \n", B_size);
       int C_size = B.columns * A.rows;
-	  printf("C_size: %d \n", C_size);
       C.rows = A.rows;
       C.columns = B.columns;
 	   
@@ -415,8 +408,6 @@ int main(int argc, char **argv)
 				NO_ARG, NO_FLAGS, &error);
       if(error != SCI_ERR_OK)
          printf("Master error! %d\n", error);
-
-      printf("prepare segment \n");
 
       SCIPrepareSegment(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -434,9 +425,6 @@ int main(int argc, char **argv)
       memcpy(pos, B.matrix, B_size * sizeof(int));
       pos = local_address;
 	  int counter;
-	  for(counter = 0; counter<120;counter++){
-		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
-	  }
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -444,36 +432,21 @@ int main(int argc, char **argv)
       MPI_Bcast(&local_node_id, 1, MPI_INT, node, MPI_COMM_WORLD);
 
 	  int chunk_size = ceil(A.rows / comm_size);
-	  printf("1. chunk_size is: %d\n", chunk_size);
 	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
-	  printf("2. A_rest.rows is: %d\n", A_rest.rows);
 	  A_rest.columns = A.columns;
-	  printf("2. A_rest.columns is: %d\n", A_rest.columns);
 	  
 	  int *A_pos = A.matrix;
-	  printf("0. Size of A.matrix: %d\n", sizeof(A.matrix));
-	  printf("1. Position of A_pos: %d\n", A_pos);
 	  A_pos += (comm_size-1) * chunk_size * A.columns;
-	  printf("2. Value of multiplication: %d\n", (comm_size-1) * chunk_size * A.columns);
-	  printf("3. Position of A_pos: %d\n", A_pos);
 	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
 	  memcpy(A_rest.matrix, A_pos, A_rest.rows * A.columns * sizeof(int));
 	  
       multiply_matrix(A_rest, B, &C_part);
-	  printf("Node: %d: Printing matrix A_rest\n", node);
 	  print_matrix(A_rest);
-	  printf("Node: %d: Printing matrix C_part\n", node);
 	  print_matrix(C_part);
-	  printf("Node: %d: matrix A_rest printed\n", node);
 	  int *C_pos = local_address;
 	  C_pos += 4 + A_size + B_size;
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
-	  
-	  pos = local_address;
-	  for(counter = 0; counter<123;counter++){
-		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
-	  }
 	  
       MPI_Barrier(MPI_COMM_WORLD);
 	  
@@ -513,7 +486,6 @@ int main(int argc, char **argv)
          printf("error: %d !!! \n", error);
 
       segment_size = SCIGetRemoteSegmentSize(remote_segment);
-      printf("segment size: %d\n", segment_size);
 	
       remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
 		&remote_map, 0, segment_size, 0, NO_FLAGS, &error);
@@ -536,7 +508,6 @@ int main(int argc, char **argv)
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
 	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
 	  print_matrix(A);
-	  print_matrix(B);
       multiply_matrix(A, B, &C_part);
 	  int *C_pos = remote_address;
 	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
