@@ -537,7 +537,7 @@ int main(int argc, char **argv)
 	  memcpy(A.matrix, A_pos, chunk_size * A.columns * sizeof(int));
 	  
 	  int *B_pos = remote_address;
-	  B_pos += 4 + A.rows * A.columns;
+	  B_pos += 4 + remote_address[0] * remote_address[1];
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
 	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
 	  printf("Node: %d: Printing matrix A\n", node);
