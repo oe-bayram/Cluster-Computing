@@ -525,6 +525,7 @@ int main(int argc, char **argv)
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
 	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
 	  print_matrix(A);
+      multiply_matrix(A, B, &C_part);
 	  write_result_segment(remote_address, C_part, comm_size, node);
 	  
       MPI_Barrier(MPI_COMM_WORLD);
