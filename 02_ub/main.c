@@ -441,7 +441,7 @@ int main(int argc, char **argv)
       local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
 	  
-	  write_matrix_segment(local_address, A, B);
+	  write_raw_matrix_segment(local_address, A, B);
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
