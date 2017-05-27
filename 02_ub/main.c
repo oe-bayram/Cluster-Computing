@@ -321,7 +321,23 @@ void write_matrix(char * filename, matrix C)
 
     free(buffer);
     MPI_File_close(&fh);
+}
 
+/*
+    write_matrix_segment(local_address, A, B)
+    write matrixes A and B to a segment
+*/
+void write_matrix_segment(int segment, matrix A, matrix B)
+{
+	int *pos = segment;
+	segment[0] = A.rows;
+	segment[1] = A.columns;
+	segment[2] = B.rows;
+	segment[3] = B.columns;
+	pos += 4;
+	memcpy(pos, A.matrix, A.rows * A.columns * sizeof(int));
+	pos += A.rows * A.columns;
+	memcpy(pos, B.matrix, B.rows * B.columns * sizeof(int));
 }
 
 /*
@@ -413,18 +429,8 @@ int main(int argc, char **argv)
 
       local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
       SEGMENT_SIZE, 0, NO_FLAGS, &error);
-		
-      int *pos = local_address;
-      local_address[0] = A.rows;
-      local_address[1] = A.columns;
-      local_address[2] = B.rows;
-      local_address[3] = B.columns;
-      pos +=4;
-      memcpy(pos, A.matrix, A_size * sizeof(int));
-      pos +=A_size;
-      memcpy(pos, B.matrix, B_size * sizeof(int));
-      pos = local_address;
-	  int counter;
+	  
+	  write_matrix_segment(local_address, A, B);
 		
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
