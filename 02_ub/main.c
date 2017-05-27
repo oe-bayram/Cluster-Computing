@@ -459,10 +459,8 @@ int main(int argc, char **argv)
 	  A_rest.rows = A.rows - (comm_size-1) * chunk_size;
 	  A_rest.columns = A.columns;
 	  
-	  int *A_pos = A.matrix;
-	  A_pos += (comm_size-1) * chunk_size * A.columns;
-	  A_rest.matrix = (int *) malloc(A_rest.rows * A.columns * sizeof(int));
-	  memcpy(A_rest.matrix, A_pos, A_rest.rows * A.columns * sizeof(int));
+	  int position = (comm_size-1) * chunk_size * A.columns + 4; // set position to beginning of matrix C
+	  read_matrix_segment(local_address, &A_rest, position);
 	  
       multiply_matrix(A_rest, B, &C_part);
 	  print_matrix(A_rest);
@@ -475,7 +473,7 @@ int main(int argc, char **argv)
 	  C.rows = A.rows;
       C.columns	= B.columns;
 	  
-	  int position = A.rows * A.columns + B.rows * B.columns + 4; // set position to beginning of matrix C
+	  position = A.rows * A.columns + B.rows * B.columns + 4; // set position to beginning of matrix C
 	  read_matrix_segment(local_address, &C, position);
 	  
       time = MPI_Wtime() - time;
@@ -508,8 +506,9 @@ int main(int argc, char **argv)
 	
       remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
 		&remote_map, 0, segment_size, 0, NO_FLAGS, &error);
-
-	  A.rows = ceil(remote_address[0] / comm_size); // chunk_size
+		
+	  int chunk_size = ceil(remote_address[0] / comm_size);
+	  A.rows = chunk_size;
 	  A.columns = remote_address[1];
 	  B.rows = remote_address[2];
 	  B.columns = remote_address[3];
