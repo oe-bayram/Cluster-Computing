@@ -462,7 +462,7 @@ int main(int argc, char **argv)
 	  print_matrix(C_part);
 	  
 	  int position = 4 + A_size + B_size; // set position to begin of segment part for C
-	  position + = (comm_size-1) * chunk_size * B.columns; // set position depending on calculated part
+	  position += (comm_size-1) * chunk_size * B.columns; // set position depending on calculated part
 	  write_result_segment(local_address, position, C_part, comm_size-1);
 	  
       MPI_Barrier(MPI_COMM_WORLD);
