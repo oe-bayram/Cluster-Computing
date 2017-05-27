@@ -10,9 +10,8 @@
 #define NO_CALLBACK 0
 #define NO_ARG 0
 
-#define SEGMENT_ID 124
+#define SEGMENT_ID 126
 #define ADAPTER_NO 0
-
 
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define INFO_BUFFER 4
