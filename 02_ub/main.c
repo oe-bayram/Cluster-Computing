@@ -474,9 +474,10 @@ int main(int argc, char **argv)
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
 	  
 	  pos = local_address;
-	  for(counter = 0; counter<120;counter++){
+	  for(counter = 0; counter<124;counter++){
 		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
 	  }
+	  
 	  
       MPI_Barrier(MPI_COMM_WORLD);
 	  
