@@ -10,7 +10,7 @@
 #define NO_CALLBACK 0
 #define NO_ARG 0
 
-#define SEGMENT_ID 122
+#define SEGMENT_ID 124
 #define ADAPTER_NO 0
 
 
@@ -477,7 +477,6 @@ int main(int argc, char **argv)
 	  for(counter = 0; counter<124;counter++){
 		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
 	  }
-	  
 	  
       MPI_Barrier(MPI_COMM_WORLD);
 	  
