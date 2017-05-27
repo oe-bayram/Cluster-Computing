@@ -528,7 +528,7 @@ int main(int argc, char **argv)
 	  B.columns = remote_address[3];
 
 	  int position = (node-1) * A.rows * A.columns + 4;
-	  read_matrix_segment(segment, &A, position);
+	  read_matrix_segment(remote_address, &A, position);
 	  
 	  int *B_pos = remote_address;
 	  B_pos += 4 + remote_address[0] * remote_address[1];
