@@ -474,7 +474,7 @@ int main(int argc, char **argv)
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
 	  
 	  pos = local_address;
-	  for(counter = 0; counter<124;counter++){
+	  for(counter = 0; counter<123;counter++){
 		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
 	  }
 	  
@@ -485,7 +485,7 @@ int main(int argc, char **argv)
       C.columns	= B.columns;
 	  int *C_end_pos = local_address;
 	  C_end_pos += 4 + A_size + B_size;
-	  C.matrix = (int *) malloc(C.rows * C.columns * sizeof(int));
+	  C.matrix = (int *) malloc(C_size * sizeof(int));
 	  memcpy(C.matrix, C_end_pos, C_size * sizeof(int));
       time = MPI_Wtime() - time;
       printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
@@ -497,7 +497,59 @@ int main(int argc, char **argv)
       free_matrix(&C_part);
       free_matrix(&C);
    } else {
-      
+      matrix C_part = nmatrix;
+      //recv_matrix_parts(&A, &B);
+      unsigned int master_node_id;
+      sci_remote_segment_t remote_segment;
+      sci_map_t remote_map;
+      unsigned int segment_size;
+      volatile int *remote_address;
+      MPI_Status status;
+      MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+      printf("received master_node_id: %d\n", master_node_id);
+
+      SCIConnectSegment(v_dev, &remote_segment, master_node_id, SEGMENT_ID, ADAPTER_NO,
+		    NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
+			
+      if(error != SCI_ERR_OK)
+         printf("error: %d !!! \n", error);
+
+      segment_size = SCIGetRemoteSegmentSize(remote_segment);
+      printf("segment size: %d\n", segment_size);
+	
+      remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
+		&remote_map, 0, segment_size, 0, NO_FLAGS, &error);
+
+      printf("Node: %d, first two array value: %d, %d\n", local_node_id,
+      remote_address[0], remote_address[1]);
+	  
+	  int chunk_size = ceil(remote_address[0] / comm_size);
+	  A.rows = chunk_size;
+	  printf("chunk_size is: %d:\n", chunk_size);
+	  A.columns = remote_address[1];
+	  B.rows = remote_address[2];
+	  B.columns = remote_address[3];
+	  int *A_pos = remote_address;
+	  A_pos += (node-1) * chunk_size * A.columns + 4;
+	  A.matrix = (int *) malloc(chunk_size * A.columns * sizeof(int));
+	  memcpy(A.matrix, A_pos, chunk_size * A.columns * sizeof(int));
+	  
+	  int *B_pos = remote_address;
+	  B_pos += 4 + A.rows * A.columns;
+	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
+	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
+	  printf("Node: %d: Printing matrix A\n", node);
+	  print_matrix(A);
+	  printf("Node: %d: Printing matrix B\n", node);
+	  print_matrix(B);
+      multiply_matrix(A, B, &C_part);
+	  int *C_pos = remote_address;
+	  C_pos += 4 + remote_address[0] * remote_address[1] + remote_address[2] * remote_address[3];
+	  C_pos += (node-1) * chunk_size * B.columns;
+	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
+      MPI_Barrier(MPI_COMM_WORLD);
+      free_matrix(&C_part);
    }
 
    //printf("node: %d finalize\n", node);
