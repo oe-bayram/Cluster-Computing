@@ -176,7 +176,7 @@ void multiply_matrix(matrix A, matrix B, matrix *C)
     write_matrix(filenmae, C)
     write matrix C to File <filename>
 */
-void write_matrix(char * filename, matrix C)
+void write_matrix(char * filename, matrix C, double time)
 {
     MPI_File_delete(filename, MPI_INFO_NULL);
 
@@ -201,6 +201,9 @@ void write_matrix(char * filename, matrix C)
 	    p += sprintf(p, " ");
     }
 
+	// write calculation time
+	p += sprintf(p, "\n\nCalculation time: %lf", time);
+	
     MPI_File_write(fh, buffer, p - buffer, MPI_CHAR, &status);
 
     free(buffer);
@@ -365,7 +368,7 @@ int main(int argc, char **argv)
       printf("calculation on %d nodes: %.2f seconds\n", comm_size, time); 
       print_matrix(C);
 	      
-      write_matrix(argv[3], C);
+      write_matrix(argv[3], C, time);
 
       free_matrix(&A_rest);
       free_matrix(&C_part);
