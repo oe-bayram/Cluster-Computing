@@ -472,10 +472,6 @@ int main(int argc, char **argv)
 	  C_pos += 4 + A_size + B_size;
 	  C_pos += (comm_size-1) * chunk_size * B.columns;
 	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
-
-	  for(counter = 0; counter<120;counter++){
-		 printf("%d. Value of pos[%d]: %d\n", counter+1, counter, pos[counter]); 
-	  }
 	  
       MPI_Barrier(MPI_COMM_WORLD);
 	  
