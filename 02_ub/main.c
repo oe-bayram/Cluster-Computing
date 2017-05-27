@@ -342,7 +342,7 @@ void write_raw_matrix_segment(int *segment, matrix A, matrix B)
 
 /*
     write_result_segment(segment, C, comm_size, node_id)
-    write result (matrix C) to segment
+    write result (matrix C) to segment depending on node id
 */
 void write_result_segment(int *segment, matrix C, int comm_size, int node_id)
 {
@@ -351,6 +351,18 @@ void write_result_segment(int *segment, matrix C, int comm_size, int node_id)
 	C_pos += 4 + segment[0] * segment[1] + segment[2] * segment[3]; // set position to begin of segment part for C
 	C_pos += (node_id-1) * chunk_size * segment[3]; // set position depending on calculated part
 	memcpy(C_pos, C.matrix, C.rows * C.columns * sizeof(int));
+}
+
+/*
+    read_matrix_segment(segment, A, position)
+    read matrix from segment (matrix A)
+*/
+void read_matrix_segment(int *segment, matrix *A, int position)
+{
+	int *A_pos = segment;
+	A_pos += position;
+	A.matrix = (int *) malloc(A.rows * A.columns * sizeof(int));
+	memcpy(A.matrix, A_pos, A.rows * A.columns * sizeof(int));
 }
 
 /*
@@ -510,20 +522,19 @@ int main(int argc, char **argv)
       printf("Node: %d, first two array value: %d, %d\n", local_node_id,
       remote_address[0], remote_address[1]);
 	  
-	  int chunk_size = ceil(remote_address[0] / comm_size);
-	  A.rows = chunk_size;
+	  A.rows = ceil(remote_address[0] / comm_size);
 	  A.columns = remote_address[1];
 	  B.rows = remote_address[2];
 	  B.columns = remote_address[3];
-	  int *A_pos = remote_address;
-	  A_pos += (node-1) * chunk_size * A.columns + 4;
-	  A.matrix = (int *) malloc(chunk_size * A.columns * sizeof(int));
-	  memcpy(A.matrix, A_pos, chunk_size * A.columns * sizeof(int));
+
+	  int position = (node-1) * A.rows * A.columns + 4;
+	  read_matrix_segment(segment, &A, position);
 	  
 	  int *B_pos = remote_address;
 	  B_pos += 4 + remote_address[0] * remote_address[1];
 	  B.matrix = (int *) malloc(B.rows * B.columns * sizeof(int));
 	  memcpy(B.matrix, B_pos, B.rows * B.columns * sizeof(int));
+	  
 	  print_matrix(A);
       multiply_matrix(A, B, &C_part);
 	  write_result_segment(remote_address, C_part, comm_size, node);
