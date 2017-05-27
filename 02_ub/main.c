@@ -324,10 +324,10 @@ void write_matrix(char * filename, matrix C)
 }
 
 /*
-    write_matrix_segment(local_address, A, B)
-    write matrixes A and B to a segment
+    write_raw_matrix_segment(local_address, A, B)
+    write matrixes A and B and their sizes to segment
 */
-void write_matrix_segment(int *segment, matrix A, matrix B)
+void write_raw_matrix_segment(int *segment, matrix A, matrix B)
 {
 	int *pos = segment;
 	segment[0] = A.rows;
@@ -340,6 +340,16 @@ void write_matrix_segment(int *segment, matrix A, matrix B)
 	memcpy(pos, B.matrix, B.rows * B.columns * sizeof(int));
 }
 
+/*
+    write_result_segment(segment, position, C, node_id)
+    write result (matrix C) to segment
+*/
+void write_result_segment(int *segment, int position, matrix C, int node_id)
+{
+	int *C_pos = segment;
+	C_pos += position;
+	memcpy(C_pos, C.matrix, C.rows * C.columns * sizeof(int));
+}
 
 /*
     main
@@ -450,10 +460,10 @@ int main(int argc, char **argv)
       multiply_matrix(A_rest, B, &C_part);
 	  print_matrix(A_rest);
 	  print_matrix(C_part);
-	  int *C_pos = local_address;
-	  C_pos += 4 + A_size + B_size;
-	  C_pos += (comm_size-1) * chunk_size * B.columns;
-	  memcpy(C_pos, C_part.matrix, C_part.rows * C_part.columns * sizeof(int));
+	  
+	  int position = 4 + A_size + B_size; // set position to begin of segment part for C
+	  position + = (comm_size-1) * chunk_size * B.columns; // set position depending on calculated part
+	  write_result_segment(local_address, position, C_part, comm_size-1);
 	  
       MPI_Barrier(MPI_COMM_WORLD);
 	  
