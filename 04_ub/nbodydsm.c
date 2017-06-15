@@ -308,7 +308,7 @@ void write_points_segment(int *segment, point *points, int full_size)
     int *pos = segment;
     segment[0] = full_size;
     pos += 1;
-    memcpy(pos, points, full_size * sizeof(int));
+    memcpy(pos, points, full_size * sizeof(point));
 }
 
 /*
@@ -320,7 +320,7 @@ void read_points_segment(int *segment, point *points)
     int *pos = segment;
     int size = segment[0];
     pos += 1;
-    memcpy(points, pos, size * sizeof(int));
+    memcpy(points, pos, size * sizeof(point));
 }
 
 /*
