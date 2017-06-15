@@ -293,10 +293,13 @@ void write_point( char *filename, int *segment)
     int size = segment[0]; 
     pos += 1;
     
+    point *points = (point *) malloc(size * sizeof(point));
+    memcpy(*points, pos, size * sizeof(point));
+    
     int i;
     for(i = 0; i < size; i++)
     {
-        point *p = pos[i];
+        point p = points[i];
         fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     }
 
