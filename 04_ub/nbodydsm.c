@@ -283,7 +283,7 @@ overhead += MPI_Wtime() - time;
 }
 
 // write point back to output
-void write_point( char *filename, int *local_address) 
+void write_point( char *filename, int *segment) 
 {
 
     FILE *fp;
