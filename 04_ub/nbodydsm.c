@@ -296,8 +296,8 @@ void write_point( char *filename, int *segment)
     int i;
     for(i = 0; i < size; i++)
     {
-point p = pos[i];
-fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
+        point *p = &pos[i];
+        fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     }
 
     fclose(fp);
