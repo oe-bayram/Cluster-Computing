@@ -294,7 +294,8 @@ void write_point( char *filename, int *segment)
     pos += 1;
     
     point *points = (point *) malloc(size * sizeof(point));
-    memcpy(*points, pos, size * sizeof(point));
+    memcpy(&points, pos, size * sizeof(point));
+    
     
     int i;
     for(i = 0; i < size; i++)
