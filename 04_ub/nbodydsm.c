@@ -315,12 +315,12 @@ void write_points_segment(int *segment, point *points, int full_size)
     write_points_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void read_points_segment(int *segment, point **points)
+void read_points_segment(int *segment, point *points)
 {
     int *pos = segment;
     int size = segment[0];
     pos += 1;
-    *points = (point *) malloc(size * sizeof(point));
+    points = (point *) malloc(size * sizeof(point));
     memcpy(points, pos, size * sizeof(point));
 }
 
