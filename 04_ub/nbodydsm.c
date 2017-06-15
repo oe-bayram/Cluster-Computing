@@ -415,8 +415,8 @@ int main(int argc, char **argv)
         double time = MPI_Wtime();
 
         // Main work
-         send_point(points, full_size);
-         work(node_id, comm_size, points, full_size, iteration);
+        // send_point(points, full_size);
+        work(node_id, comm_size, points, full_size, iteration);
 
         // Final time
         double final_time = MPI_Wtime() - time;
@@ -433,7 +433,7 @@ int main(int argc, char **argv)
         MPI_Status status;
         MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-        //printf("%d: received master_node_id: %d\n", node, master_node_id);
+        printf("%d: received master_node_id: %d\n", node, master_node_id);
 
         SCIConnectSegment(v_dev, &remote_segment, master_node_id, SEGMENT_ID, ADAPTER_NO,
             NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
@@ -449,6 +449,9 @@ int main(int argc, char **argv)
         //printf("Worker started\n");
         //receive_points(&points, &full_size);
         read_points_segment(remote_address, &points);
+        // Check if read from segment
+        point *p1 = &points[0];
+        printf("First coordinate is: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
         work(node_id, comm_size, points, full_size, iteration);
     }
     
