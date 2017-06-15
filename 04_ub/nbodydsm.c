@@ -283,16 +283,20 @@ overhead += MPI_Wtime() - time;
 }
 
 // write point back to output
-void write_point( char *filename, point *points, int size) 
+void write_point( char *filename, int *local_address) 
 {
 
     FILE *fp;
     fp = fopen(filename, "w");
 
+    int *pos = segment;
+    int size = segment[0]; 
+    pos += 1;
+    
     int i;
     for(i = 0; i < size; i++)
     {
-point p = points[i];
+point p = pos[i];
 fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     }
 
@@ -422,7 +426,7 @@ int main(int argc, char **argv)
         // Final time
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
-        write_point(argv[3], points, full_size);    
+        write_point(argv[3], local_address);    
     }
     else
     {
@@ -447,7 +451,6 @@ int main(int argc, char **argv)
         
         read_points_segment(remote_address, &points, &full_size);
         work(node_id, comm_size, points, full_size, iteration);
-        printf("Checkpoint 6!\n");
     }
     
     //printf("finalize\n");
