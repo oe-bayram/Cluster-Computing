@@ -48,20 +48,20 @@ vector acceleration(point *a, point *b)
     //  This way we are sure that every node will chose the same point.
     if(dist < DIST_THRESHOLD)
     {
-        //printf("THRESHOLD\n");
-        if(a->weight > b->weight || (a->weight == b->weight && a < b))
-        {
-            a->weight *= b->weight;
-            b->weight = 0;
-        }
-        else
-        {
-            b->weight *= a->weight;
-            a->weight = 0;
-        }
+         //printf("THRESHOLD\n");
+         if(a->weight > b->weight || (a->weight == b->weight && a < b))
+         {
+              a->weight *= b->weight;
+              b->weight = 0;
+         }
+         else
+         {
+              b->weight *= a->weight;
+              a->weight = 0;
+         }
 
-        vector direction = {0, 0};
-        return direction;
+         vector direction = {0, 0};
+         return direction;
     }
 
     vector direction;
@@ -91,28 +91,28 @@ void actualise_vel(vector *vel, vector acc)
 //  Update point position
 //  Absorbed points ( weight == 0) are ignored
 void compute_movement(  point *points, vector *point_vel, unsigned int offset,
-                        unsigned int compute_size, unsigned int point_size) 
+                             unsigned int compute_size, unsigned int point_size) 
 {
     unsigned int i, j;
 
     //compute new point_vel for each point between offset and offset + compute_size
     for(i = offset; i < offset + compute_size; i++)
     {
-        point *p1 = &points[i];
+         point *p1 = &points[i];
 // if weight == 0, point is absorbed and should be ignored
-        if(p1->weight == 0) continue;
-        
-        vector acc = {0, 0};
-        for(j = 0; j < point_size; j++)
-        {
-            point *p2 = &points[j];
+         if(p1->weight == 0) continue;
+         
+         vector acc = {0, 0};
+         for(j = 0; j < point_size; j++)
+         {
+              point *p2 = &points[j];
     // if absorbed or same point ignore
-            if (p2->weight == 0 || p1 == p2) continue;
-            // add acceleration to total acceleration
-            actualise_vel(&acc, acceleration(p1, p2));
-        }
+              if (p2->weight == 0 || p1 == p2) continue;
+              // add acceleration to total acceleration
+              actualise_vel(&acc, acceleration(p1, p2));
+         }
 // add actual computed acceleration to velocity
-        actualise_vel(&point_vel[i - offset], acc);
+         actualise_vel(&point_vel[i - offset], acc);
     }
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
@@ -120,12 +120,12 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     // compute new point position
     for(i = offset; i < offset + compute_size; i++)
     {
-        point *p = &points[i];
-        
-        if(p->weight == 0) continue;
+         point *p = &points[i];
+         
+         if(p->weight == 0) continue;
 // apply movement
-        p->x += point_vel[i - offset].x;
-        p->y += point_vel[i - offset].y;
+         p->x += point_vel[i - offset].x;
+         p->y += point_vel[i - offset].y;
     }
 }
 
@@ -153,22 +153,22 @@ void read_point(char *filename, point **points, int *full_size)
 
     while (pos < buffer + size)
     {
-        char *end;
-        float x = strtod(pos, &end);
-        pos = end;
-        float y = strtod(pos, &end);
-        pos = end;
-        float weight = strtod(pos, &end);
+         char *end;
+         float x = strtod(pos, &end);
+         pos = end;
+         float y = strtod(pos, &end);
+         pos = end;
+         float weight = strtod(pos, &end);
 
-        if (end == pos)
-            break;
-        
-        point p = { x, y, weight };
+         if (end == pos)
+              break;
+         
+         point p = { x, y, weight };
 //printf("x: %.1f, y: %.1f, weight: %.1f\n", x, y, weight);
-        (*points)[index] = p;
+         (*points)[index] = p;
 
-        pos = end;
-        index++;
+         pos = end;
+         index++;
     }
 
     *full_size = index;
@@ -187,7 +187,7 @@ void send_point(point *points, int size)
 {
     //printf("start send point\n");
     MPI_Bcast(&size, 1, MPI_INT, MASTER_ID, MPI_COMM_WORLD);
-    MPI_Bcast(points, size * 3, MPI_FLOAT, MASTER_ID, MPI_COMM_WORLD);   
+    MPI_Bcast(points, size * 3, MPI_FLOAT, MASTER_ID, MPI_COMM_WORLD);    
 }
 
 //  Initialize velocity vector
@@ -198,8 +198,8 @@ void init_vel(vector **point_vel, int size)
     int i;
     for(i = 0; i < size; i++)
     {
-        vector v = {0, 0};      // null velocity at start
-        (*point_vel)[i] = v;
+         vector v = {0, 0};        // null velocity at start
+         (*point_vel)[i] = v;
     }
 }
 
@@ -227,13 +227,13 @@ void update_points(int comm_size, point *points, int size)
     int node_id;
     for(node_id = 0; node_id < comm_size; node_id++)
     {
-        int start   = chunk * node_id;
-        
+         int start    = chunk * node_id;
+         
 if(node_id == comm_size -1)
     chunk = size - start;
 
 //printf("node_id: %d, start: %d, size: %d, count: %d\n", node_id, start, size, chunk);
-        MPI_Bcast(points + (start/3), chunk, MPI_FLOAT, node_id, MPI_COMM_WORLD);
+         MPI_Bcast(points + (start/3), chunk, MPI_FLOAT, node_id, MPI_COMM_WORLD);
     }
 }
 
@@ -265,12 +265,12 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     int i;
     for(i = 0; i < iteration; i++)
     {
-        compute_movement(points, point_vel, offset, compute_size, full_size);
-        
-        
+         compute_movement(points, point_vel, offset, compute_size, full_size);
+         
+         
     // Das fällt weg, weil gleich in die Segmente...
 double time = MPI_Wtime();
-        update_points(comm_size, points, full_size);
+         update_points(comm_size, points, full_size);
 overhead += MPI_Wtime() - time;
     }
     
@@ -300,6 +300,16 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
 }
 
 /*
+    write_points_segment(local_address, A, B)
+    write matrixes A and B and their sizes to segment
+*/
+void write_points_segment(int *segment, point *points, int full_size)
+{
+    int *pos = segment;
+    memcpy(pos, points, full_size * sizeof(int));
+}
+
+/*
 Master:
 - read points from file
 - send point to worker
@@ -317,10 +327,10 @@ Work:
 int main(int argc, char **argv)
 {
     //printf("START MAIN\n");
-    int node_id;            // MPI rank from 0 to n nodes
-    int comm_size;          // number of nodes
-    point *points;          // array holding all the points
-    int full_size;          // number of points
+    int node_id;              // MPI rank from 0 to n nodes
+    int comm_size;            // number of nodes
+    point *points;            // array holding all the points
+    int full_size;            // number of points
 
 
     //  MPI initialisation
@@ -329,77 +339,80 @@ int main(int argc, char **argv)
     MPI_Status status;
     MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
     
-    sci_desc_t    v_dev;
-   sci_error_t error;
+    sci_desc_t v_dev;
+    sci_error_t error;
 
-   SCIInitialize(NO_FLAGS, &error);
-   printf("SCI initialized\n");
-   if(error != SCI_ERR_OK)
-   printf("error Init\n");
+    SCIInitialize(NO_FLAGS, &error);
+    printf("SCI initialized\n");
+    if(error != SCI_ERR_OK)
+    printf("error Init\n");
 
-   SCIOpen(&v_dev, NO_FLAGS, &error);
-   printf("SCI opened\n");
-   if(error != SCI_ERR_OK) {
-   printf("Error Open\n");
-      return 1;
-   }
-   
-   unsigned int local_node_id;
-   sci_query_adapter_t query;
-   query.subcommand = SCI_Q_ADAPTER_NODEID;
-   query.localAdapterNo = ADAPTER_NO;
-   query.data = &local_node_id;
-   SCIQuery(SCI_Q_ADAPTER, &query, NO_FLAGS, &error);
+    SCIOpen(&v_dev, NO_FLAGS, &error);
+    printf("SCI opened\n");
+    if(error != SCI_ERR_OK) {
+    printf("Error Open\n");
+        return 1;
+    }
+    
+    unsigned int local_node_id;
+    sci_query_adapter_t query;
+    query.subcommand = SCI_Q_ADAPTER_NODEID;
+    query.localAdapterNo = ADAPTER_NO;
+    query.data = &local_node_id;
+    SCIQuery(SCI_Q_ADAPTER, &query, NO_FLAGS, &error);
     
     int iteration = (int) strtol(argv[1], NULL, 10);
 
     if(node_id == MASTER_ID)
     {
-      sci_local_segment_t local_segment;
-      int *local_address;
-      sci_map_t local_map;
-      
-//printf("Master started\n");
-        read_point(argv[2], &points, &full_size);
+        sci_local_segment_t local_segment;
+        int *local_address;
+        sci_map_t local_map;
         
-      unsigned int SEGMENT_SIZE = full_size;
-      printf("prepare segment: %d \n", SEGMENT_SIZE);
-      
-      SCICreateSegment(v_dev, &local_segment, SEGMENT_ID, SEGMENT_SIZE, NO_CALLBACK,
-                NO_ARG, NO_FLAGS, &error);
-      if(error != SCI_ERR_OK)
-         printf("Master error! %d\n", error);
+        //printf("Master started\n");
+         read_point(argv[2], &points, &full_size);
+         
+        unsigned int SEGMENT_SIZE = full_size;
+        printf("prepare segment: %d \n", SEGMENT_SIZE);
+        
+        SCICreateSegment(v_dev, &local_segment, SEGMENT_ID, SEGMENT_SIZE, NO_CALLBACK,
+                   NO_ARG, NO_FLAGS, &error);
+        if(error != SCI_ERR_OK)
+           printf("Master error! %d\n", error);
 
-      SCIPrepareSegment(local_segment, ADAPTER_NO, NO_FLAGS, &error);
+        SCIPrepareSegment(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
-      local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
-      SEGMENT_SIZE, 0, NO_FLAGS, &error);
-      
-      printf("Checkpoint 1!\n");
-      //write_raw_matrix_segment(local_address, A, B);
-      
-      SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
+        local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
+        SEGMENT_SIZE, 0, NO_FLAGS, &error);
+        
+        printf("Checkpoint 1!\n");
+        write_points_segment(local_address, points, full_size);
+        
+        // Check if written to segment
+        printf("First coordinate is: %.1f\n", local_address[0]);
+        
+        SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
-      // send segment information to other nodes
-      MPI_Bcast(&local_node_id, 1, MPI_INT, node_id, MPI_COMM_WORLD);
+        // send segment information to other nodes
+        MPI_Bcast(&local_node_id, 1, MPI_INT, node_id, MPI_COMM_WORLD);
 
-// Take time
-double time = MPI_Wtime();
+        // Take time
+        double time = MPI_Wtime();
 
-// Main work
-        send_point(points, full_size);
-        work(node_id, comm_size, points, full_size, iteration);
+        // Main work
+         send_point(points, full_size);
+         work(node_id, comm_size, points, full_size, iteration);
 
-// Final time
-double final_time = MPI_Wtime() - time;
-printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
+        // Final time
+        double final_time = MPI_Wtime() - time;
+        printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
         write_point(argv[3], points, full_size);    
     }
     else
     {
-//printf("Worker started\n");
-        receive_points(&points, &full_size);
-        work(node_id, comm_size, points, full_size, iteration);
+        //printf("Worker started\n");
+         receive_points(&points, &full_size);
+         work(node_id, comm_size, points, full_size, iteration);
     }
     
     //printf("finalize\n");
