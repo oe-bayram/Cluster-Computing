@@ -440,18 +440,12 @@ int main(int argc, char **argv)
         
         if(error != SCI_ERR_OK)
          printf("error: %d !!! \n", error);
-        printf("Checkpoint 1!\n");
         segment_size = SCIGetRemoteSegmentSize(remote_segment);
-        printf("Checkpoint 2!\n");
         remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
-        printf("Checkpoint 3!\n");
         
         read_points_segment(remote_address, &points);
-        // Check if read from segment
-        printf("Checkpoint 4!\n");
-        point *p1 = &points[0];
-        printf("Checkpoint 5!\n");
+        point *p1 = &points[4];
         printf("First coordinate is: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
         work(node_id, comm_size, points, full_size, iteration);
         printf("Checkpoint 6!\n");
