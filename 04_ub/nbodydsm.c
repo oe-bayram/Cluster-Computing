@@ -283,25 +283,17 @@ overhead += MPI_Wtime() - time;
 }
 
 // write point back to output
-void write_point( char *filename, int *segment) 
+void write_point( char *filename, point *points, int size) 
 {
 
     FILE *fp;
     fp = fopen(filename, "w");
 
-    int *pos = segment;
-    int size = segment[0]; 
-    pos += 1;
-    
-    point *points = (point *) malloc(size * sizeof(point));
-    memcpy(&points, pos, size * sizeof(point));
-    
-    
     int i;
     for(i = 0; i < size; i++)
     {
-        point p = points[i];
-        fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
+point p = points[i];
+fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     }
 
     fclose(fp);
@@ -430,7 +422,8 @@ int main(int argc, char **argv)
         // Final time
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
-        write_point(argv[3], local_address);    
+        read_points_segment(local_address, &points, &full_size);
+        write_point(argv[3], points, full_size);
     }
     else
     {
