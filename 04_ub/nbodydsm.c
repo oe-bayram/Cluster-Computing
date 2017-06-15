@@ -404,7 +404,7 @@ int main(int argc, char **argv)
         
         // Check if written to segment
         point *p1 = &local_address[1];
-        printf("First coordinate is: %.1f\n", p1->weight);
+        printf("First coordinate is: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
         
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
