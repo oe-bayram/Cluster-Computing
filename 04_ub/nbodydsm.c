@@ -315,7 +315,7 @@ void write_points_segment(int *segment, point *points, int full_size)
     write_points_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void read_points_segment(int *segment, point **points)
+void read_points_segment(int *segment, point *points)
 {
     int *pos = segment;
     int size = segment[0];
@@ -449,7 +449,7 @@ int main(int argc, char **argv)
         read_points_segment(remote_address, &points);
         // Check if read from segment
         printf("Checkpoint 4!\n");
-        point *p1 = &remote_address[1];
+        point *p1 = &points[0];
         printf("Checkpoint 5!\n");
         printf("First coordinate is: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
         work(node_id, comm_size, points, full_size, iteration);
