@@ -437,7 +437,7 @@ int main(int argc, char **argv)
 
         SCIConnectSegment(v_dev, &remote_segment, master_node_id, SEGMENT_ID, ADAPTER_NO,
             NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
-            S
+        
         if(error != SCI_ERR_OK)
          printf("error: %d !!! \n", error);
 
