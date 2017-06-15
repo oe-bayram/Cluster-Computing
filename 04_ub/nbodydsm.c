@@ -306,7 +306,21 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
 void write_points_segment(int *segment, point *points, int full_size)
 {
     int *pos = segment;
+    segment[0] = full_size;
+    pos += 1;
     memcpy(pos, points, full_size * sizeof(int));
+}
+
+/*
+    write_points_segment(local_address, A, B)
+    write matrixes A and B and their sizes to segment
+*/
+void read_points_segment(int *segment, point **points)
+{
+    int *pos = segment;
+    int size = segment[0];
+    pos += 1;
+    memcpy(points, pos, size * sizeof(int));
 }
 
 /*
@@ -389,7 +403,8 @@ int main(int argc, char **argv)
         write_points_segment(local_address, points, full_size);
         
         // Check if written to segment
-        printf("First coordinate is: %.1f\n", local_address[0]);
+        point *p1 = &local_address[1];
+        printf("First coordinate is: %.1f\n", p1->weight);
         
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -410,9 +425,31 @@ int main(int argc, char **argv)
     }
     else
     {
+        unsigned int master_node_id;
+        sci_remote_segment_t remote_segment;
+        sci_map_t remote_map;
+        unsigned int segment_size;
+        volatile int *remote_address;
+        MPI_Status status;
+        MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        //printf("%d: received master_node_id: %d\n", node, master_node_id);
+
+        SCIConnectSegment(v_dev, &remote_segment, master_node_id, SEGMENT_ID, ADAPTER_NO,
+            NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
+            S
+        if(error != SCI_ERR_OK)
+         printf("error: %d !!! \n", error);
+
+        segment_size = SCIGetRemoteSegmentSize(remote_segment);
+
+        remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
+            &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
+            
         //printf("Worker started\n");
-         receive_points(&points, &full_size);
-         work(node_id, comm_size, points, full_size, iteration);
+        //receive_points(&points, &full_size);
+        read_points_segment(remote_address, &points);
+        work(node_id, comm_size, points, full_size, iteration);
     }
     
     //printf("finalize\n");
