@@ -381,7 +381,7 @@ int main(int argc, char **argv)
       SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
       // send segment information to other nodes
-      MPI_Bcast(&local_node_id, 1, MPI_INT, node, MPI_COMM_WORLD);
+      MPI_Bcast(&local_node_id, 1, MPI_INT, node_id, MPI_COMM_WORLD);
 
 // Take time
 double time = MPI_Wtime();
