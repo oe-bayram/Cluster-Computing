@@ -6,6 +6,13 @@
 #include <math.h>
 #include <string.h>
 
+#define NO_FLAGS 0
+#define NO_CALLBACK 0
+#define NO_ARG 0
+
+#define SEGMENT_ID 126
+#define ADAPTER_NO 0
+
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
 #define MASTER_ID 0
@@ -107,6 +114,8 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
 // add actual computed acceleration to velocity
         actualise_vel(&point_vel[i - offset], acc);
     }
+    
+    // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
 
     // compute new point position
     for(i = offset; i < offset + compute_size; i++)
@@ -257,7 +266,9 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     for(i = 0; i < iteration; i++)
     {
         compute_movement(points, point_vel, offset, compute_size, full_size);
-
+        
+        
+    // Das fällt weg, weil gleich in die Segmente...
 double time = MPI_Wtime();
         update_points(comm_size, points, full_size);
 overhead += MPI_Wtime() - time;
@@ -318,12 +329,59 @@ int main(int argc, char **argv)
     MPI_Status status;
     MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
     
+    sci_desc_t    v_dev;
+   sci_error_t error;
+
+   SCIInitialize(NO_FLAGS, &error);
+   printf("SCI initialized\n");
+   if(error != SCI_ERR_OK)
+   printf("error Init\n");
+
+   SCIOpen(&v_dev, NO_FLAGS, &error);
+   printf("SCI opened\n");
+   if(error != SCI_ERR_OK) {
+   printf("Error Open\n");
+      return 1;
+   }
+   
+   unsigned int local_node_id;
+   sci_query_adapter_t query;
+   query.subcommand = SCI_Q_ADAPTER_NODEID;
+   query.localAdapterNo = ADAPTER_NO;
+   query.data = &local_node_id;
+   SCIQuery(SCI_Q_ADAPTER, &query, NO_FLAGS, &error);
+    
     int iteration = (int) strtol(argv[1], NULL, 10);
 
     if(node_id == MASTER_ID)
     {
+      sci_local_segment_t local_segment;
+      int *local_address;
+      sci_map_t local_map;
+      
 //printf("Master started\n");
         read_point(argv[2], &points, &full_size);
+        
+      unsigned int SEGMENT_SIZE = full_size;
+      printf("prepare segment: %d \n", SEGMENT_SIZE);
+      
+      SCICreateSegment(v_dev, &local_segment, SEGMENT_ID, SEGMENT_SIZE, NO_CALLBACK,
+                NO_ARG, NO_FLAGS, &error);
+      if(error != SCI_ERR_OK)
+         printf("Master error! %d\n", error);
+
+      SCIPrepareSegment(local_segment, ADAPTER_NO, NO_FLAGS, &error);
+
+      local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
+      SEGMENT_SIZE, 0, NO_FLAGS, &error);
+      
+      printf("Checkpoint 1!\n");
+      //write_raw_matrix_segment(local_address, A, B);
+      
+      SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
+
+      // send segment information to other nodes
+      MPI_Bcast(&local_node_id, 1, MPI_INT, node, MPI_COMM_WORLD);
 
 // Take time
 double time = MPI_Wtime();
@@ -349,4 +407,3 @@ printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_t
 
     MPI_Finalize();
 }
-

@@ -1,4 +1,4 @@
 all:
-	mpicc -o nbody nbody.c
+	mpicc -o nbodydsm nbodydsm.c -I/opt/DIS/include/
 run:
-	mpirun -nodes tusci00,tusci08 nbody 100 points out
+	mpirun -nodes tusci00,tusci08 nbodydsm 100 points out
