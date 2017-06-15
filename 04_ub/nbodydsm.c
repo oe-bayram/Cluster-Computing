@@ -315,10 +315,11 @@ void write_points_segment(int *segment, point *points, int full_size)
     write_points_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void read_points_segment(int *segment, point **points)
+void read_points_segment(int *segment, point **points, int *full_size)
 {
     int *pos = segment;
     int size = segment[0];
+    *full_size = size;
     pos += 1;
     *points = (point *) malloc(size * sizeof(point));
     memcpy(*points, pos, size * sizeof(point));
@@ -444,9 +445,7 @@ int main(int argc, char **argv)
         remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
         
-        read_points_segment(remote_address, &points);
-        point *p1 = &points[4];
-        printf("First coordinate is: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
+        read_points_segment(remote_address, &points, &full_size);
         work(node_id, comm_size, points, full_size, iteration);
         printf("Checkpoint 6!\n");
     }
