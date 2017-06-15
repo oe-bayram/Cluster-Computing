@@ -433,7 +433,7 @@ int main(int argc, char **argv)
         MPI_Status status;
         MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-        printf("%d: received master_node_id: %d\n", node, master_node_id);
+        printf("%d: received master_node_id: %d\n", node_id, master_node_id);
 
         SCIConnectSegment(v_dev, &remote_segment, master_node_id, SEGMENT_ID, ADAPTER_NO,
             NO_CALLBACK, NO_ARG, SCI_INFINITE_TIMEOUT, NO_FLAGS, &error);
