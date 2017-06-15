@@ -445,13 +445,11 @@ int main(int argc, char **argv)
         remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
         printf("Checkpoint 3!\n");
-        //printf("Worker started\n");
-        //receive_points(&points, &full_size);
         
         read_points_segment(remote_address, &points);
         // Check if read from segment
         printf("Checkpoint 4!\n");
-        point *p1 = &points[0];
+        point *p1 = &remote_address[1];
         printf("Checkpoint 5!\n");
         printf("First coordinate is: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
         work(node_id, comm_size, points, full_size, iteration);
