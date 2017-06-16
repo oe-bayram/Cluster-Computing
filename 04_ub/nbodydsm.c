@@ -313,7 +313,7 @@ void write_point_segment(int *segment, point *point, int offset)
     
     point *points;
     *points = (point *) malloc(5 * sizeof(point));
-    read_points_segment(remote_address, &points, 5);
+    read_points_segment(segment, &points, 5);
     point *p = &points[offset];
     printf("written this points: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
     
