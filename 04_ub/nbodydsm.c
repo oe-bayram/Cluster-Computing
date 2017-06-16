@@ -116,6 +116,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     }
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
+    MPI_Barrier(MPI_COMM_WORLD);
 
     // compute new point position
     for(i = offset; i < offset + compute_size; i++)
@@ -229,11 +230,11 @@ void update_points(int comm_size, point *points, int size)
     {
          int start    = chunk * node_id;
          
-if(node_id == comm_size -1)
-    chunk = size - start;
+        if(node_id == comm_size -1)
+        chunk = size - start;
 
-//printf("node_id: %d, start: %d, size: %d, count: %d\n", node_id, start, size, chunk);
-         MPI_Bcast(points + (start/3), chunk, MPI_FLOAT, node_id, MPI_COMM_WORLD);
+        printf("node_id: %d, start: %d, size: %d, count: %d\n", node_id, start, size, chunk);
+        MPI_Bcast(points + (start/3), chunk, MPI_FLOAT, node_id, MPI_COMM_WORLD);
     }
 }
 
