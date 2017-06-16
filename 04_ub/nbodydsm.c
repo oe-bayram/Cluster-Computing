@@ -132,10 +132,6 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         printf("point values are: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
         // write new position to segment
         write_point_segment(segment, p, i);
-        
-        // test
-        point *p1 = &segment[i+1];
-        printf("Written point values are: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
     }
 }
 
@@ -314,6 +310,13 @@ void write_point_segment(int *segment, point *point, int offset)
     pos += 1;
     pos += offset;
     memcpy(pos, point, 1 * sizeof(point));
+    
+    point *points;
+    *points = (point *) malloc(5 * sizeof(point));
+    read_points_segment(remote_address, &points, 5);
+    point *p = &points[offset];
+    printf("written this points: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
+    
 }
 
 /*
