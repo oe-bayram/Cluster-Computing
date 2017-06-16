@@ -91,7 +91,7 @@ void actualise_vel(vector *vel, vector acc)
 //  Update point position
 //  Absorbed points ( weight == 0) are ignored
 void compute_movement(  point *points, vector *point_vel, unsigned int offset,
-                             unsigned int compute_size, unsigned int point_size) 
+                             unsigned int compute_size, unsigned int point_size, int *segment) 
 {
     unsigned int i, j;
 
@@ -128,6 +128,9 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
 // apply movement
          p->x += point_vel[i - offset].x;
          p->y += point_vel[i - offset].y;
+         
+         // write new position to segment
+         write_point_segment(segment, p, i);
     }
 }
 
@@ -242,7 +245,7 @@ void update_points(int comm_size, point *points, int size)
 // The work done by Workers and Master
 // for each iteration a new position is computed for the points, and send between the Nodes
 // after all iterations are done exit
-void work(int node_id, int comm_size, point *points, int full_size, int iteration)
+void work(int node_id, int comm_size, point *points, int full_size, int iteration, int *segment)
 {
     // overhead counter
     double overhead = 0;
@@ -267,13 +270,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     int i;
     for(i = 0; i < iteration; i++)
     {
-         compute_movement(points, point_vel, offset, compute_size, full_size);
-         
-         
-    // Das fällt weg, weil gleich in die Segmente...
-double time = MPI_Wtime();
-         update_points(comm_size, points, full_size);
-overhead += MPI_Wtime() - time;
+         compute_movement(points, point_vel, offset, compute_size, full_size, segment);
     }
     
 
@@ -299,6 +296,17 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     }
 
     fclose(fp);
+}
+
+/*
+    write_point_segment(local_address, A, B)
+    write matrixes A and B and their sizes to segment
+*/
+void write_point_segment(int *segment, point *point, int offset)
+{
+    int *pos = segment;
+    pos += offset;
+    memcpy(pos, point, 1 * sizeof(point));
 }
 
 /*
@@ -419,7 +427,7 @@ int main(int argc, char **argv)
 
         // Main work
         // send_point(points, full_size);
-        work(node_id, comm_size, points, full_size, iteration);
+        work(node_id, comm_size, points, full_size, iteration, local_address);
 
         // Final time
         double final_time = MPI_Wtime() - time;
@@ -449,7 +457,7 @@ int main(int argc, char **argv)
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
         
         read_points_segment(remote_address, &points, &full_size);
-        work(node_id, comm_size, points, full_size, iteration);
+        work(node_id, comm_size, points, full_size, iteration, remote_segment);
     }
     
     //printf("finalize\n");
