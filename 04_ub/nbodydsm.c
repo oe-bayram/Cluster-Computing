@@ -122,6 +122,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     printf("offset is: %d and offset + compute_size is: %d\n", offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
+        printf("#######  Iteration: %d  #######\n", i);
         point *p = &points[i];
          
         if(p->weight == 0) continue;
@@ -132,6 +133,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         printf("point values are: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
         // write new position to segment
         printf("offset is here: %d\n", i);
+        
         write_point_segment(segment, p, i);
     }
 }
