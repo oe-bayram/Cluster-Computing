@@ -231,7 +231,7 @@ void update_points(int comm_size, point *points, int size)
          int start    = chunk * node_id;
          
         if(node_id == comm_size -1)
-        chunk = size - start;
+            chunk = size - start;
 
         printf("node_id: %d, start: %d, size: %d, count: %d\n", node_id, start, size, chunk);
         MPI_Bcast(points + (start/3), chunk, MPI_FLOAT, node_id, MPI_COMM_WORLD);
@@ -423,7 +423,7 @@ int main(int argc, char **argv)
         // Final time
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
-        read_points_segment(local_address, &points, &full_size);
+        //read_points_segment(local_address, &points, &full_size);
         write_point(argv[3], points, full_size);
     }
     else
