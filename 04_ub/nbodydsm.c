@@ -303,18 +303,18 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     write_point_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void write_point_segment(int *segment, point *point, int offset)
+void write_point_segment(int *segment, point *p, int offset)
 {
-    printf("got this point: %.1f %.1f %.1f\n", point->x, point->y, point->weight);
+    printf("got this point: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
     int *pos = segment;
     pos += 1;
     pos += offset;
-    memcpy(pos, point, 1 * sizeof(point));
+    memcpy(pos, p, 1 * sizeof(point));
     point *mypoints;
     *mypoints = (point *) malloc(5 * sizeof(point));
     read_points_segment(segment, &mypoints, 5);
-    point *p = &mypoints[offset];
-    printf("written this points: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
+    point *p1 = &mypoints[offset];
+    printf("written this points: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
     
 }
 
