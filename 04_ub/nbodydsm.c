@@ -91,7 +91,7 @@ void actualise_vel(vector *vel, vector acc)
 //  Update point position
 //  Absorbed points ( weight == 0) are ignored
 void compute_movement(  point *points, vector *point_vel, unsigned int offset,
-                             unsigned int compute_size, unsigned int point_size, int *segment) 
+                             unsigned int compute_size, unsigned int point_size, int *segment, int node_id) 
 {
     unsigned int i, j;
 
@@ -122,7 +122,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     printf("offset is: %d and offset + compute_size is: %d\n", offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
-        printf("#######  Iteration: %d  #######\n", i);
+        printf("#######  %d: Iteration: %d  #######\n", node_id, i);
         point *p = &points[i];
          
         if(p->weight == 0) continue;
@@ -274,7 +274,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     int i;
     for(i = 0; i < iteration; i++)
     {
-         compute_movement(points, point_vel, offset, compute_size, full_size, segment);
+         compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
     }
     
 
