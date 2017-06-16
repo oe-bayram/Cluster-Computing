@@ -310,8 +310,7 @@ void write_point_segment(int *segment, point *p, int offset)
     pos += 1;
     pos += offset;
     memcpy(pos, p, 1 * sizeof(point));
-    point *mypoints;
-    *mypoints = (point *) malloc(5 * sizeof(point));
+    point *mypoints = (point *) malloc(5 * sizeof(point));
     read_points_segment(segment, &mypoints, 5);
     point *p1 = &mypoints[offset];
     printf("written this points: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
