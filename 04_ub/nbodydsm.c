@@ -472,8 +472,18 @@ int main(int argc, char **argv)
         segment_size = SCIGetRemoteSegmentSize(remote_segment);
         remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
-        
+        int k;
+        int *pos = remote_address;
+        pos += 1;
+        for(k = 0; k < point_size; k++) {
+            point *p = &pos[k*3];
+            printf("%d: Test-Point %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
+        }
         read_points_segment(remote_address, &points, &full_size);
+        for(k = 0; k < point_size; k++) {
+            point *p = &points[k];
+            printf("%d: Test-Point2 %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
+        }
         work(node_id, comm_size, points, full_size, iteration, remote_segment);
     }
     
