@@ -149,6 +149,7 @@ print_points(int *segment){
         point *p = &local_points[k];
         printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
     }
+    printf("Checkpoint 1");
 }
 
 // Read point from file
