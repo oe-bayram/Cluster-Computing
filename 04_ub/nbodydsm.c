@@ -322,7 +322,7 @@ void write_points_segment(point *segment, point *points)
     point *pos = segment;
     point *values = &segment[0];
     int size = (int) values->x;
-    printf("Size has been read: %d \n", size);
+    printf("%d: Size has been read: %d \n", node_id, size);
     pos += 1;
     memcpy(pos, points, size * sizeof(point));
 }
@@ -331,12 +331,12 @@ void write_points_segment(point *segment, point *points)
     write_points_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void read_points_segment(point *segment, point **points, int *full_size)
+void read_points_segment(point *segment, point **points, int *full_size, int node_id)
 {
     point *pos = segment;
     point *values = &segment[0];
     int size = (int) values->x;
-    printf("Size has been read: %d \n", size);
+    printf("%d: Size has been read: %d \n", node_id, size);
     *full_size = size;
     pos += 1;
     *points = (point *) malloc(size * sizeof(point));
@@ -424,7 +424,7 @@ int main(int argc, char **argv)
         point values = { size, 0.0, 0.0 };
         memcpy(local_address, &values, 1 * sizeof(point));
         
-        write_points_segment(local_address, points);
+        write_points_segment(local_address, points, node_id);
         
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -441,7 +441,7 @@ int main(int argc, char **argv)
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
         
-        read_points_segment(local_address, &points, &full_size);
+        read_points_segment(local_address, &points, &full_size, node_id);
         
         write_point(argv[3], points, full_size);
     }
@@ -466,7 +466,7 @@ int main(int argc, char **argv)
         remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
 
-        read_points_segment(remote_address, &points, &full_size);
+        read_points_segment(remote_address, &points, &full_size, node_id);
         work(node_id, comm_size, points, full_size, iteration, remote_segment);
     }
     
