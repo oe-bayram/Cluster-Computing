@@ -135,7 +135,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         point *my_points;
         int my_size;
         int k;
-        void read_points_segment(segment, &my_points, &my_size, node_id);
+        read_points_segment(segment, &my_points, &my_size, node_id);
         
         for(k = 0; k<my_size; k++){
             point *p1 = &my_points[k];
@@ -144,7 +144,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         
         write_point_segment(segment, p, i);
         
-        void read_points_segment(segment, &my_points, &my_size, node_id);
+        read_points_segment(segment, &my_points, &my_size, node_id);
         
         for(k = 0; k<my_size; k++){
             point *p1 = &my_points[k];
