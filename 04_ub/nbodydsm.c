@@ -465,7 +465,7 @@ int main(int argc, char **argv)
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
 
         point *mypoints;
-        read_points_segment(local_address, &mypoints, &full_size, node_id);
+        read_points_segment(remote_address, &mypoints, &full_size, node_id);
         
         int i;
         for(i = 0; i<full_size; i++){
