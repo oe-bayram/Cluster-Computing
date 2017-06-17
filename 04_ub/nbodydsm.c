@@ -140,7 +140,7 @@ print_points(point *points, unsigned int point_size){
     int i;
     for(i = 0; i < point_size; i++) {
         point *p = &points[i];
-        printf("Point %i: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
+        printf("Point %i: %.1f %.1f %.1f\n", i, p->x, p->y, p->weight);
     }
 }
 
