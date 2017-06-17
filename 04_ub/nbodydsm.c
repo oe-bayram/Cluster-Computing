@@ -322,7 +322,6 @@ void write_points_segment(point *segment, point *points, int node_id)
     point *pos = segment;
     point *values = &segment[0];
     int size = (int) values->x;
-    printf("%d: Size has been read: %d \n", node_id, size);
     pos += 1;
     memcpy(pos, points, size * sizeof(point));
 }
@@ -336,7 +335,6 @@ void read_points_segment(point *segment, point **points, int *full_size, int nod
     point *pos = segment;
     point *values = &segment[0];
     int size = (int) values->x;
-    printf("%d: Size has been read: %d \n", node_id, size);
     *full_size = size;
     pos += 1;
     *points = (point *) malloc(size * sizeof(point));
@@ -425,6 +423,14 @@ int main(int argc, char **argv)
         memcpy(local_address, &values, 1 * sizeof(point));
         
         write_points_segment(local_address, points, node_id);
+        point *mypoints;
+        read_points_segment(local_address, &mypoints, &full_size, node_id);
+        
+        int i;
+        for(i = 0; i<full_size; i++){
+            point *p = &mypoints[i];
+            printf("Point %d is: %.1f %.1f %.1f \n", i, p->x, p->y, p->weight);
+        }
         
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
