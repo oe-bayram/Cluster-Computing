@@ -423,14 +423,6 @@ int main(int argc, char **argv)
         memcpy(local_address, &values, 1 * sizeof(point));
         
         write_points_segment(local_address, points, node_id);
-        point *mypoints;
-        read_points_segment(local_address, &mypoints, &full_size, node_id);
-        
-        int i;
-        for(i = 0; i<full_size; i++){
-            point *p = &mypoints[i];
-            printf("Point %d is: %.1f %.1f %.1f \n", i, p->x, p->y, p->weight);
-        }
         
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
@@ -472,6 +464,15 @@ int main(int argc, char **argv)
         remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
 
+        point *mypoints;
+        read_points_segment(local_address, &mypoints, &full_size, node_id);
+        
+        int i;
+        for(i = 0; i<full_size; i++){
+            point *p = &mypoints[i];
+            printf("Point %d is: %.1f %.1f %.1f \n", i, p->x, p->y, p->weight);
+        }
+            
         read_points_segment(remote_address, &points, &full_size, node_id);
         work(node_id, comm_size, points, full_size, iteration, remote_segment);
     }
