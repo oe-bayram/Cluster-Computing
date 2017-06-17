@@ -262,6 +262,14 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     int compute_size;
     int offset;
     
+    printf("full_size is: %d\n", full_size);
+    int k;
+    for(k = 0; k<full_size;k++){
+       point *p = &points[k];
+       printf("point %d is: %.1f %.1f %.1f \n", k, ); 
+    }
+    
+    
     compute_size = full_size / comm_size;
     offset = node_id * compute_size;
 
