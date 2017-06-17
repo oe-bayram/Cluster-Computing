@@ -117,10 +117,10 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
     MPI_Barrier(MPI_COMM_WORLD);
+    printf("%d: Barrier passed!", node_id);
 
     // compute new point position
     printf("%d: offset is: %d and offset + compute_size is: %d\n", node_id, offset, offset + compute_size);
-    print_points(points, point_size);
     for(i = offset; i < offset + compute_size; i++)
     {
         //printf("#######  %d: Iteration: %u  #######\n", node_id, i);
@@ -131,16 +131,27 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         p->y += point_vel[i - offset].y;
         printf("point values are: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
         // write new position to segment
+        int k;
+        for(k = 0; k < point_size; k++) {
+            point *p = &points[k];
+            printf("Before Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
+        
         write_point_segment(segment, p, i);
+        
+        for(k = 0; k < point_size; k++) {
+            point *p = &points[k];
+            printf("After Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
+        
     }
-    print_points(points, point_size);
 }
 
 print_points(point *points, unsigned int point_size){
-    int i;
-    for(i = 0; i < point_size; i++) {
-        point *p = &points[i];
-        printf("Point %i: %.1f %.1f %.1f\n", i, p->x, p->y, p->weight);
+    int k;
+    for(k = 0; k < point_size; k++) {
+        point *p = &points[k];
+        printf("Before Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
     }
 }
 
