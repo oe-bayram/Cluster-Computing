@@ -307,7 +307,7 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
 */
 void write_point_segment(point *segment, point *p, int offset)
 {
-    printf("got this point: %.1f %.1f %.1f and offset is: %u\n", p->x, p->y, p->weight, offset);
+    //printf("got this point: %.1f %.1f %.1f and offset is: %u\n", p->x, p->y, p->weight, offset);
     point *pos = segment;
     pos += 1;
     pos += (offset);
