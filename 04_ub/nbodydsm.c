@@ -132,27 +132,20 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
         printf("%d: Printing points before write to segment... \n", node_id);
-        //print_points(segment);
+        int k;
+        int *pos = segment;
+        pos += 1;
+        for(k = 0; k < point_size; k++) {
+            point *p = &pos[k];
+            printf("%d: Point %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
+        }
         write_point_segment(segment, p, i);
         printf("%d: Printing points after write to segment... \n", node_id);
-        print_points(segment, node_id);
+        for(k = 0; k < point_size; k++) {
+            point *p = &pos[k];
+            printf("%d: Point %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
+        }
     }
-}
-
-print_points(int *segment, int node_id){
-    printf("%d: Checkpoint 1", node_id);
-    point *local_points;
-    printf("%d: Checkpoint 2", node_id);
-    int size;
-    read_points_segment(segment, &local_points, &size);
-    printf("%d: Checkpoint 3", node_id);
-    printf("Size is: %d \n", size);
-    int k;
-    for(k = 0; k < size; k++) {
-        point *p = &local_points[k];
-        printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
-    }
-    printf("%d: Checkpoint 4", node_id);
 }
 
 // Read point from file
