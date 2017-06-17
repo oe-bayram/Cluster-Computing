@@ -136,7 +136,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         int k;
         int *pos = segment;
         pos += 1;
-        for(k = 0; k < full_size; k++) {
+        for(k = 0; k < point_size; k++) {
             point *p1 = &pos[k*3];
             printf("Point in segment %d: %.1f %.1f %.1f\n", k, p1->x, p1->y, p1->weight);
         }
