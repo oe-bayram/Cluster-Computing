@@ -131,7 +131,24 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         p->y += point_vel[i - offset].y;
         printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
+        point *my_points;
+        int my_size;
+        int k;
+        
+        read_points_segment(segment, &my_points, &my_size, node_id);
+
+        for(k = 0; k<my_size; k++){
+            point *p = &my_points[k];
+            printf("%d: Point %d before written is: %.1f %.1f %.1f \n", node_id, k, p->x, p->y, p->weight);
+        }
         write_point_segment(segment, p, i);
+        
+        read_points_segment(segment, &my_points, &my_size, node_id);
+
+        for(k = 0; k<my_size; k++){
+            point *p = &my_points[k];
+            printf("%d: Point %d after written is: %.1f %.1f %.1f \n", node_id, k, p->x, p->y, p->weight);
+        }
     }
 }
 
@@ -272,7 +289,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     for(i = 0; i < iteration; i++)
     {
          compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
-         read_points_segment(segment, &points, &full_size);
+         read_points_segment(segment, &points, &full_size, node_id);
          //update_points(comm_size, points, full_size);
     }
         
@@ -463,16 +480,7 @@ int main(int argc, char **argv)
         segment_size = SCIGetRemoteSegmentSize(remote_segment);
         remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
-
-        point *mypoints;
-        read_points_segment(remote_address, &mypoints, &full_size, node_id);
-        
-        int i;
-        for(i = 0; i<full_size; i++){
-            point *p = &mypoints[i];
-            printf("Point %d is: %.1f %.1f %.1f \n", i, p->x, p->y, p->weight);
-        }
-            
+ 
         read_points_segment(remote_address, &points, &full_size, node_id);
         work(node_id, comm_size, points, full_size, iteration, remote_segment);
     }
