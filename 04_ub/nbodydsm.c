@@ -143,10 +143,10 @@ print_points(int *segment){
     point *local_points;
     int size;
     read_points_segment(segment, &local_points, &size);
-    
+    printf("Size is: %d \n", size);
     int k;
     for(k = 0; k < size; k++) {
-        point *p = local_points[k];
+        point *p = &local_points[k];
         printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
     }
 }
