@@ -284,15 +284,6 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
          compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
          //update_points(comm_size, points, full_size);
     }
-    
-    printf("%d: Printing before Ending!", node_id);
-    int k;
-    int *pos = segment;
-    pos += 1;
-    for(k = 0; k < full_size; k++) {
-        point *p = &pos[k];
-        printf("%d: Point %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
-    }
         
     free(point_vel);
     //printf("%d end work\n", node_id);
@@ -447,24 +438,26 @@ int main(int argc, char **argv)
         // Take time
         double time = MPI_Wtime();
 
+        int k;
+        for(k = 0; k < full_size; k++) {
+            point *p = &points[k];
+            printf("Point in points %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
+        int *pos = local_address;
+        pos += 1;
+        for(k = 0; k < full_size; k++) {
+            point *p = &pos[k];
+            printf("Point in segment %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
         // Main work
         work(node_id, comm_size, points, full_size, iteration, local_address);
 
         // Final time
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
-        int k;
-        for(k = 0; k < full_size; k++) {
-            point *p = &points[k];
-            printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
-        }
+        
         read_points_segment(local_address, &points, &full_size);
-        int *pos = local_address;
-        pos += 1;
-        for(k = 0; k < full_size; k++) {
-            point *p = &pos[k];
-            printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
-        }
+        
         write_point(argv[3], points, full_size);
     }
     else
