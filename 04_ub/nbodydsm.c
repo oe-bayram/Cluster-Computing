@@ -133,6 +133,8 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         //printf("offset is here: %u\n", i);
         
         write_point_segment(segment, p, i);
+        point *p1 = &segment[i];
+        printf("New point values are: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
     }
 }
 
@@ -256,14 +258,6 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     // how much points this Node need to compute
     int compute_size;
     int offset;
-    
-    printf("full_size is: %d\n", full_size);
-    int k;
-    for(k = 0; k<full_size;k++){
-       point *p = &points[k];
-       printf("point %d is: %.1f %.1f %.1f \n", k, p->x, p->y, p->weight); 
-    }
-    
     
     compute_size = full_size / comm_size;
     offset = node_id * compute_size;
