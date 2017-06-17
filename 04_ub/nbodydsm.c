@@ -125,7 +125,10 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     {
         //printf("#######  %d: Iteration: %u  #######\n", node_id, i);
         point *p = &points[i];
-        if(p->weight == 0) continue;
+        if(p->weight == 0){
+            printf("%d: Weight of points[%d] was 0... \n", node_id, i);
+            continue;
+        }
         // apply movement
         p->x += point_vel[i - offset].x;
         p->y += point_vel[i - offset].y;
