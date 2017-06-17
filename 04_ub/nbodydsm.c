@@ -123,8 +123,9 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     //printf("%d: offset is: %d and offset + compute_size is: %d\n", node_id, offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
-        printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
         point *p = &points[i];
+        
+        printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
         if(p->weight == 0){
             printf("%d: Weight of points[%d] was 0: %.1f and points are: \n", node_id, i, p->weight);
             //print_points(segment, node_id, iteration);
