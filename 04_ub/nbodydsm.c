@@ -123,12 +123,11 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     //printf("%d: offset is: %d and offset + compute_size is: %d\n", node_id, offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
-        //printf("#######  %d: Iteration: %u  #######\n", node_id, i);
+        printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
         point *p = &points[i];
         if(p->weight == 0){
-            
-            printf("%d: Weight of points[%d] was 0 and points are: \n", node_id, i);
-            print_points(segment, node_id, iteration);
+            printf("%d: Weight of points[%d] was 0: %.1f and points are: \n", node_id, i, p->weight);
+            //print_points(segment, node_id, iteration);
             continue;
         }
         // apply movement
@@ -136,12 +135,12 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         p->y += point_vel[i - offset].y;
         //printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
-        
-        print_points(segment, node_id, iteration);
+        printf("In Iteration %d is Node %d writing point %d to segment with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
+        //print_points(segment, node_id, iteration);
         
         write_point_segment(segment, p, i, node_id);
         
-        print_points(segment, node_id, iteration);
+        //print_points(segment, node_id, iteration);
         
     }
 }
@@ -208,17 +207,6 @@ void read_point(char *filename, point **points, int *full_size)
     //printf("end read points\n");
 }
 
-// Send point from Master to Worker node
-// 1 send: number of points
-// 2 send: full point array
-// Each struct is 3 float, so we send 3 * size * MPI_FLOAT
-void send_point(point *points, int size)
-{
-    //printf("start send point\n");
-    MPI_Bcast(&size, 1, MPI_INT, MASTER_ID, MPI_COMM_WORLD);
-    MPI_Bcast(points, size * 3, MPI_FLOAT, MASTER_ID, MPI_COMM_WORLD);    
-}
-
 //  Initialize velocity vector
 void init_vel(vector **point_vel, int size)
 {
@@ -229,40 +217,6 @@ void init_vel(vector **point_vel, int size)
     {
          vector v = {0, 0};        // null velocity at start
          (*point_vel)[i] = v;
-    }
-}
-
-// Receive initialisation points from Master
-void receive_points(point **points, int *full_size)
-{
-    int size;
-    // receive broadcast
-    MPI_Bcast(&size, 1, MPI_INT, MASTER_ID, MPI_COMM_WORLD);
-    // alocate array
-    *points = (point *) malloc(size * sizeof(point));
-    MPI_Bcast(*points, size * 3, MPI_FLOAT, MASTER_ID, MPI_COMM_WORLD); // Each point consist of 3 float
-
-    *full_size = size;
-
-    //printf("worker received points\n");
-}
-
-// Every Node Bcast its part to the other. From 0 to n Nodes
-void update_points(int comm_size, point *points, int size)
-{
-
-    size *= 3;// Each point consist of 3 float
-    int chunk =  (size / comm_size);
-    int node_id;
-    for(node_id = 0; node_id < comm_size; node_id++)
-    {
-         int start    = chunk * node_id;
-         
-        if(node_id == comm_size -1)
-            chunk = size - start;
-
-        printf("node_id: %d, start: %d, size: %d, count: %d\n", node_id, start, size, chunk);
-        MPI_Bcast(points + (start/3), chunk, MPI_FLOAT, node_id, MPI_COMM_WORLD);
     }
 }
 
