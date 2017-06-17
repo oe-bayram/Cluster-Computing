@@ -147,15 +147,18 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
 }
 
 print_points(point *segment, int node_id, int iteration){
+    printf("%d: Cechpoint 1", node_id);
     point *my_points;
     int my_size;
     int k;
+    printf("%d: Cechpoint 2", node_id);
     read_points_segment(segment, &my_points, &my_size, node_id);
-    
+    printf("%d: Cechpoint 3", node_id);
     for(k = 0; k<my_size; k++){
         point *p1 = &my_points[k];
         printf("Iteration %d and node %d: point values of %d are: %.1f %.1f %.1f\n", iteration, node_id, k, p1->x, p1->y, p1->weight);
     }
+    printf("%d: Cechpoint 4", node_id);
 }
 
 // Read point from file
