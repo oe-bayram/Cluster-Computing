@@ -130,16 +130,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         p->y += point_vel[i - offset].y;
         printf("point values are: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
         // write new position to segment
-        //printf("offset is here: %u\n", i);
-        int *pos = segment;
-        pos += 1;
-        
-        point *p0 = &pos[i];
-        printf("Old point values are: %.1f %.1f %.1f\n", p0->x, p0->y, p0->weight);
-        write_point_segment(segment, p, i);
-        
-        point *p1 = &pos[i];
-        printf("New point values are: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
+        //write_point_segment(segment, p, i);
     }
 }
 
