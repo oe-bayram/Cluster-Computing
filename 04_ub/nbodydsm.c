@@ -142,7 +142,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
             printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, k, p1->x, p1->y, p1->weight);
         }
         
-        write_point_segment(segment, p, i);
+        write_point_segment(segment, p, i, node_id);
         
         read_points_segment(segment, &my_points, &my_size, node_id);
         
@@ -324,9 +324,9 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     write_point_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void write_point_segment(point *segment, point *p, int offset)
+void write_point_segment(point *segment, point *p, int offset, int node_id)
 {
-    printf("got this point: %.1f %.1f %.1f and offset is: %u\n", p->x, p->y, p->weight, offset);
+    printf("%d: got this point: %.1f %.1f %.1f and offset is: %u\n", node_id, p->x, p->y, p->weight, offset);
     point *pos = segment;
     pos += 1;
     pos += (offset);
