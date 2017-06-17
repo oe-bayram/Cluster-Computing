@@ -124,11 +124,11 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     for(i = offset; i < offset + compute_size; i++)
     {
         point *p = &points[i];
-        print_points(points, point_size, node_id, iteration);
-        print_points_segment(segment, node_id, iteration);
-        printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
+        //print_points(points, point_size, node_id, iteration);
+        //print_points_segment(segment, node_id, iteration);
+        //printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
         if(p->weight == 0){
-            printf("%d: Weight of points[%d] was 0: %.1f and points are: \n", node_id, i, p->weight);
+            //printf("%d: Weight of points[%d] was 0: %.1f and points are: \n", node_id, i, p->weight);
             //print_points_segment(segment, node_id, iteration);
             continue;
         }
@@ -137,12 +137,12 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         p->y += point_vel[i - offset].y;
         //printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
-        printf("In Iteration %d is Node %d writing point %d to segment with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
-        print_points_segment(segment, node_id, iteration);
+        //printf("In Iteration %d is Node %d writing point %d to segment with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
+        //print_points_segment(segment, node_id, iteration);
         
         write_point_segment(segment, p, i, node_id);
         
-        print_points_segment(segment, node_id, iteration);
+        //print_points_segment(segment, node_id, iteration);
         
     }
     MPI_Barrier(MPI_COMM_WORLD);
