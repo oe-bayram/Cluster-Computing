@@ -490,7 +490,8 @@ int main(int argc, char **argv)
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
  
         read_points_segment(remote_address, &points, &full_size, node_id);
-        work(node_id, comm_size, points, full_size, iteration, remote_segment);
+        work(node_id, comm_size, points, full_size, iteration, remote_address);
+        
     }
     
     //printf("finalize\n");
