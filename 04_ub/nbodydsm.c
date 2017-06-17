@@ -284,7 +284,15 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
          compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
          //update_points(comm_size, points, full_size);
     }
-
+    
+    printf("%d: Printing before Ending!", node_id);
+    int *pos = segment;
+    pos += 1;
+    for(k = 0; k < full_size; k++) {
+        point *p = &pos[k];
+        printf("%d: Point %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
+    }
+        
     free(point_vel);
     //printf("%d end work\n", node_id);
     if(node_id == 0)
