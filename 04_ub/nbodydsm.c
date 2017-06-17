@@ -475,12 +475,12 @@ int main(int argc, char **argv)
         int k;
         int *pos = remote_address;
         pos += 1;
-        for(k = 0; k < point_size; k++) {
+        for(k = 0; k < remote_address[0]; k++) {
             point *p = &pos[k*3];
             printf("%d: Test-Point %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
         }
         read_points_segment(remote_address, &points, &full_size);
-        for(k = 0; k < point_size; k++) {
+        for(k = 0; k < full_size; k++) {
             point *p = &points[k];
             printf("%d: Test-Point2 %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
         }
