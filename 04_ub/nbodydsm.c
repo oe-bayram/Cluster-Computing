@@ -441,17 +441,6 @@ int main(int argc, char **argv)
         // Take time
         double time = MPI_Wtime();
 
-        int k;
-        for(k = 0; k < full_size; k++) {
-            point *p = &points[k];
-            printf("Point in points %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
-        }
-        int *pos = local_address;
-        pos += 1;
-        for(k = 0; k < full_size; k++) {
-            point *p = &pos[k];
-            printf("Point in segment %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
-        }
         // Main work
         work(node_id, comm_size, points, full_size, iteration, local_address);
 
@@ -485,6 +474,17 @@ int main(int argc, char **argv)
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
         
         read_points_segment(remote_address, &points, &full_size);
+        int k;
+        for(k = 0; k < full_size; k++) {
+            point *p = &points[k];
+            printf("Point in points %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
+        int *pos = remote_address;
+        pos += 1;
+        for(k = 0; k < full_size; k++) {
+            point *p = &pos[k];
+            printf("Point in segment %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
         work(node_id, comm_size, points, full_size, iteration, remote_segment);
     }
     
