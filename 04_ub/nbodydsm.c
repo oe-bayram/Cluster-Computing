@@ -137,6 +137,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
 }
 
 print_points(point *points, unsigned int point_size){
+    int i;
     for(i = 0; i < point_size; i++) {
         point *p = &points[i];
         printf("Point %i: %.1f %.1f %.1f\n", p->x, p->y, p->weight);
