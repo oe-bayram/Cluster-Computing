@@ -135,7 +135,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     }
 }
 
-print_points(point *segment, unsigned int point_size){
+print_points(int *segment, unsigned int point_size){
     int k;
     int *pos = segment;
     pos += 1;
@@ -439,13 +439,23 @@ int main(int argc, char **argv)
         double time = MPI_Wtime();
 
         // Main work
-        // send_point(points, full_size);
         work(node_id, comm_size, points, full_size, iteration, local_address);
 
         // Final time
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
+        int k;
+        for(k = 0; k < full_size; k++) {
+            point *p = &points[k];
+            printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
         read_points_segment(local_address, &points, &full_size);
+        int *pos = segment;
+        pos += 1;
+        for(k = 0; k < full_size; k++) {
+            point *p = &pos[k];
+            printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
         write_point(argv[3], points, full_size);
     }
     else
