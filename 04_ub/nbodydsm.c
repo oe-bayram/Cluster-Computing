@@ -271,10 +271,9 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     for(i = 0; i < iteration; i++)
     {
          compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
+         update_points(comm_size, points, full_size);
     }
-    
-    update_points(comm_size, points, full_size);
-    
+
     free(point_vel);
     //printf("%d end work\n", node_id);
     if(node_id == 0)
