@@ -131,12 +131,6 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         p->y += point_vel[i - offset].y;
         printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
-        printf("%d: Printing points before write to segment... \n", node_id);
-        int k;
-        for(k = 0; k < point_size; k++) {
-            point *p = &points[k];
-            printf("%d: Point %d: %.1f %.1f %.1f\n", node_id, k, p->x, p->y, p->weight);
-        }
         write_point_segment(segment, p, i);
     }
 }
@@ -278,6 +272,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     for(i = 0; i < iteration; i++)
     {
          compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
+         read_points_segment(segment, &points, &full_size);
          //update_points(comm_size, points, full_size);
     }
         
