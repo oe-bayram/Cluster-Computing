@@ -474,7 +474,7 @@ int main(int argc, char **argv)
         sci_remote_segment_t remote_segment;
         sci_map_t remote_map;
         unsigned int segment_size;
-        volatile int *remote_address;
+        point *remote_address;
         MPI_Status status;
         MPI_Bcast(&master_node_id, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -486,7 +486,7 @@ int main(int argc, char **argv)
         if(error != SCI_ERR_OK)
          printf("error: %d !!! \n", error);
         segment_size = SCIGetRemoteSegmentSize(remote_segment);
-        remote_address = (volatile int *) SCIMapRemoteSegment(remote_segment, 
+        remote_address = (point *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
  
         read_points_segment(remote_address, &points, &full_size, node_id);
