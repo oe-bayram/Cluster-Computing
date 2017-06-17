@@ -91,7 +91,7 @@ void actualise_vel(vector *vel, vector acc)
 //  Update point position
 //  Absorbed points ( weight == 0) are ignored
 void compute_movement(  point *points, vector *point_vel, unsigned int offset,
-                             unsigned int compute_size, unsigned int point_size, point *segment, int node_id) 
+                             unsigned int compute_size, unsigned int point_size, point *segment, int node_id, int iteration) 
 {
     unsigned int i, j;
 
@@ -132,25 +132,24 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         //printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
         
-        point *my_points;
-        int my_size;
-        int k;
-        read_points_segment(segment, &my_points, &my_size, node_id);
-        
-        for(k = 0; k<my_size; k++){
-            point *p1 = &my_points[k];
-            printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, k, p1->x, p1->y, p1->weight);
-        }
+        print_points(segment, node_id, iteration);
         
         write_point_segment(segment, p, i, node_id);
         
-        read_points_segment(segment, &my_points, &my_size, node_id);
+        print_points(segment, node_id, iteration);
         
-        for(k = 0; k<my_size; k++){
-            point *p1 = &my_points[k];
-            printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, k, p1->x, p1->y, p1->weight);
-        }
-        
+    }
+}
+
+print_points(point *segment, int node_id, int iteration){
+    point *my_points;
+    int my_size;
+    int k;
+    read_points_segment(segment, &my_points, &my_size, node_id);
+    
+    for(k = 0; k<my_size; k++){
+        point *p1 = &my_points[k];
+        printf("Iteration %d and node %d: point values of %d are: %.1f %.1f %.1f\n", iteration, node_id, k, p1->x, p1->y, p1->weight);
     }
 }
 
@@ -290,8 +289,9 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     int i;
     for(i = 0; i < iteration; i++)
     {
-        //printf("%d: Started computing for iteration: %d \n", node_id, i);
-        compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
+        printf("%d: Started computing for iteration: %d and points are: \n", node_id, i);
+        print_points(segment, node_id, iteration);
+        compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id, iteration);
         read_points_segment(segment, &points, &full_size, node_id);
         //update_points(comm_size, points, full_size);
     }
