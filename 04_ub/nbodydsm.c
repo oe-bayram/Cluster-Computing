@@ -119,7 +119,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     MPI_Barrier(MPI_COMM_WORLD);
 
     // compute new point position
-    printf("offset is: %d and offset + compute_size is: %d\n", offset, offset + compute_size);
+    printf("%d: offset is: %d and offset + compute_size is: %d\n", node_id, offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
         //printf("#######  %d: Iteration: %u  #######\n", node_id, i);
