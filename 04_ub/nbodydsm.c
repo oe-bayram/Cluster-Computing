@@ -328,6 +328,9 @@ void write_point_segment(int *segment, point *p, unsigned int offset)
 */
 void write_points_segment(int *segment, point *points, int full_size)
 {
+    printf("full_size is: %d", full_size);
+    printf("size of point is: %d", sizeof(point));
+    printf("size of points is: %d", sizeof(points));
     int *pos = segment;
     segment[0] = full_size;
     pos += 1;
