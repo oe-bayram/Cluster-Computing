@@ -117,8 +117,10 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
     MPI_Barrier(MPI_COMM_WORLD);
+    printf("%d: Barrier passed!", node_id);
 
     // compute new point position
+    printf("%d: offset is: %d and offset + compute_size is: %d\n", node_id, offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
         //printf("#######  %d: Iteration: %u  #######\n", node_id, i);
@@ -127,8 +129,17 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         // apply movement
         p->x += point_vel[i - offset].x;
         p->y += point_vel[i - offset].y;
+        printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
-        write_point_segment(segment, p, i);  
+        write_point_segment(segment, p, i);
+        printf("%d: point written to segment: \n", node_id);
+        int k;
+        int *pos = segment;
+        pos += 1;
+        for(k = 0; k < full_size; k++) {
+            point *p1 = &pos[k*3];
+            printf("Point in segment %d: %.1f %.1f %.1f\n", k, p1->x, p1->y, p1->weight);
+        }
     }
 }
 
@@ -312,9 +323,10 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
 */
 void write_point_segment(int *segment, point *p, unsigned int offset)
 {
+    printf("got this point: %.1f %.1f %.1f and offset is: %u\n", p->x, p->y, p->weight, offset);
     int *pos = segment;
     pos += 1;
-    pos += offset*3;
+    pos += (offset*3);
     memcpy(pos, p, 1 * sizeof(point));
 }
 
@@ -467,6 +479,17 @@ int main(int argc, char **argv)
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
         
         read_points_segment(remote_address, &points, &full_size);
+        int k;
+        for(k = 0; k < full_size; k++) {
+            point *p = &points[k];
+            printf("Point in points %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
+        int *pos = remote_address;
+        pos += 1;
+        for(k = 0; k < full_size; k++) {
+            point *p = &pos[k*3];
+            printf("Point in segment %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
+        }
         work(node_id, comm_size, points, full_size, iteration, remote_segment);
     }
     
