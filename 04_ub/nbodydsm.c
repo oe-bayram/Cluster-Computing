@@ -450,7 +450,7 @@ int main(int argc, char **argv)
             printf("Point %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
         }
         read_points_segment(local_address, &points, &full_size);
-        int *pos = segment;
+        int *pos = local_address;
         pos += 1;
         for(k = 0; k < full_size; k++) {
             point *p = &pos[k];
