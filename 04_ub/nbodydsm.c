@@ -317,7 +317,7 @@ void write_point_segment(point *segment, point *p, int offset)
     write_points_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void write_points_segment(point *segment, point *points)
+void write_points_segment(point *segment, point *points, int node_id)
 {
     point *pos = segment;
     point *values = &segment[0];
