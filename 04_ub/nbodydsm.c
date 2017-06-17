@@ -266,7 +266,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     int k;
     for(k = 0; k<full_size;k++){
        point *p = &points[k];
-       printf("point %d is: %.1f %.1f %.1f \n", k, ); 
+       printf("point %d is: %.1f %.1f %.1f \n", k, p->x, p->y, p->weight); 
     }
     
     
