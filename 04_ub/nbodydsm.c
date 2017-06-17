@@ -124,11 +124,12 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     for(i = offset; i < offset + compute_size; i++)
     {
         point *p = &points[i];
-        print_points(segment, node_id, iteration);
+        print_points(points, point_size, node_id, iteration);
+        print_points_segment(segment, node_id, iteration);
         printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
         if(p->weight == 0){
             printf("%d: Weight of points[%d] was 0: %.1f and points are: \n", node_id, i, p->weight);
-            //print_points(segment, node_id, iteration);
+            //print_points_segment(segment, node_id, iteration);
             continue;
         }
         // apply movement
@@ -137,29 +138,33 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         //printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
         // write new position to segment
         printf("In Iteration %d is Node %d writing point %d to segment with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
-        print_points(segment, node_id, iteration);
+        print_points_segment(segment, node_id, iteration);
         
         write_point_segment(segment, p, i, node_id);
         
-        print_points(segment, node_id, iteration);
+        print_points_segment(segment, node_id, iteration);
         
     }
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
-print_points(point *segment, int node_id, int iteration){
-    //printf("%d: Cechpoint 1", node_id);
+print_points(point *points, int size, int node_id, int iteration){
+    int k;
+    for(k = 0; k<size; k++){
+        point *p1 = &points[k];
+        printf("Iteration %d and node %d: Point values of %d are: %.1f %.1f %.1f\n", iteration, node_id, k, p1->x, p1->y, p1->weight);
+    }
+}
+
+print_points_segment(point *segment, int node_id, int iteration){
     point *my_points;
     int my_size;
     int k;
-    //printf("%d: Cechpoint 2", node_id);
     read_points_segment(segment, &my_points, &my_size, node_id);
-    //printf("%d: Cechpoint 3", node_id);
     for(k = 0; k<my_size; k++){
         point *p1 = &my_points[k];
         printf("Iteration %d and node %d: point values of %d are: %.1f %.1f %.1f\n", iteration, node_id, k, p1->x, p1->y, p1->weight);
     }
-    //printf("%d: Cechpoint 4", node_id);
 }
 
 // Read point from file
@@ -254,7 +259,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     for(i = 0; i < iteration; i++)
     {
         //printf("%d: Started computing for iteration: %d and points are: \n", node_id, i);
-        //print_points(segment, node_id, i);
+        //print_points_segment(segment, node_id, i);
         compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id, i);
         read_points_segment(segment, &points, &full_size, node_id);
         //update_points(comm_size, points, full_size);
