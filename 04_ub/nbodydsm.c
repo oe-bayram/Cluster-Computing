@@ -271,7 +271,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     int i;
     for(i = 0; i < iteration; i++)
     {
-        printf("Started computing for iteration: %d \n", iteration);
+        printf("%d: Started computing for iteration: %d \n", node_id, iteration);
         compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id);
         read_points_segment(segment, &points, &full_size, node_id);
         //update_points(comm_size, points, full_size);
