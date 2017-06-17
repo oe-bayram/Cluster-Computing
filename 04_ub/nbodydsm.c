@@ -422,9 +422,9 @@ int main(int argc, char **argv)
         // Storing size information into first position in segment
         float size = (float) full_size;
         point values = { size, 0.0, 0.0 };
-        memcpy(local_address, *values, 1 * sizeof(point));
+        memcpy(local_address, &values, 1 * sizeof(point));
         
-        write_points_segment(local_address, points, full_size);
+        write_points_segment(local_address, points);
         
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
