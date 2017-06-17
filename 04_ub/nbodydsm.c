@@ -330,6 +330,7 @@ void write_points_segment(int *segment, point *points, int full_size)
 {
     printf("full_size is: %d \n", full_size);
     printf("size of point is: %d \n", sizeof(point));
+    printf("size of float is: %d \n", sizeof(float));
     printf("size of points is: %d \n", sizeof(points));
     printf("size of full_size * sizeof(point) is: %d \n", full_size * sizeof(point));
     int *pos = segment;
