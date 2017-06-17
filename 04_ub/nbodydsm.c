@@ -144,6 +144,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
         print_points(segment, node_id, iteration);
         
     }
+    MPI_Barrier(MPI_COMM_WORLD);
 }
 
 print_points(point *segment, int node_id, int iteration){
