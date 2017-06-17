@@ -286,6 +286,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
     }
     
     printf("%d: Printing before Ending!", node_id);
+    int k;
     int *pos = segment;
     pos += 1;
     for(k = 0; k < full_size; k++) {
