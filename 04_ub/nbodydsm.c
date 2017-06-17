@@ -484,7 +484,7 @@ int main(int argc, char **argv)
         int *pos = remote_address;
         pos += 1;
         for(k = 0; k < full_size; k++) {
-            point *p = &pos[k];
+            point *p = &pos[k*3];
             printf("Point in segment %d: %.1f %.1f %.1f\n", k, p->x, p->y, p->weight);
         }
         work(node_id, comm_size, points, full_size, iteration, remote_segment);
