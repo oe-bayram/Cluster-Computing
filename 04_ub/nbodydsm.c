@@ -91,7 +91,7 @@ void actualise_vel(vector *vel, vector acc)
 //  Update point position
 //  Absorbed points ( weight == 0) are ignored
 void compute_movement(  point *points, vector *point_vel, unsigned int offset,
-                             unsigned int compute_size, unsigned int point_size, int *segment, int node_id) 
+                             unsigned int compute_size, unsigned int point_size, point *segment, int node_id) 
 {
     unsigned int i, j;
 
@@ -246,7 +246,7 @@ void update_points(int comm_size, point *points, int size)
 // The work done by Workers and Master
 // for each iteration a new position is computed for the points, and send between the Nodes
 // after all iterations are done exit
-void work(int node_id, int comm_size, point *points, int full_size, int iteration, int *segment)
+void work(int node_id, int comm_size, point *points, int full_size, int iteration, point *segment)
 {
     // overhead counter
     double overhead = 0;
@@ -304,12 +304,12 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     write_point_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void write_point_segment(int *segment, point *p, int offset)
+void write_point_segment(point *segment, point *p, int offset)
 {
     printf("got this point: %.1f %.1f %.1f and offset is: %u\n", p->x, p->y, p->weight, offset);
-    int *pos = segment;
+    point *pos = segment;
     pos += 1;
-    pos += (offset*3);
+    pos += (offset);
     memcpy(pos, p, 1 * sizeof(point));
 }
 
@@ -317,22 +317,26 @@ void write_point_segment(int *segment, point *p, int offset)
     write_points_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void write_points_segment(int *segment, point *points, int full_size)
+void write_points_segment(point *segment, point *points)
 {
-    int *pos = segment;
-    segment[0] = full_size;
+    point *pos = segment;
+    point *values = &segment[0];
+    int size = (int) values->x;
+    printf("Size has been read: %d \n", size);
     pos += 1;
-    memcpy(pos, points, full_size * sizeof(point));
+    memcpy(pos, points, size * sizeof(point));
 }
 
 /*
     write_points_segment(local_address, A, B)
     write matrixes A and B and their sizes to segment
 */
-void read_points_segment(int *segment, point **points, int *full_size)
+void read_points_segment(point *segment, point **points, int *full_size)
 {
-    int *pos = segment;
-    int size = segment[0];
+    point *pos = segment;
+    point *values = &segment[0];
+    int size = (int) values->x;
+    printf("Size has been read: %d \n", size);
     *full_size = size;
     pos += 1;
     *points = (point *) malloc(size * sizeof(point));
@@ -396,13 +400,13 @@ int main(int argc, char **argv)
     if(node_id == MASTER_ID)
     {
         sci_local_segment_t local_segment;
-        int *local_address;
+        point *local_address;
         sci_map_t local_map;
         
         //printf("Master started\n");
          read_point(argv[2], &points, &full_size);
          
-        unsigned int SEGMENT_SIZE = full_size;
+        unsigned int SEGMENT_SIZE = full_size * sizeof(point) + 1 * sizeof(int);
         printf("prepare segment: %d \n", SEGMENT_SIZE);
         
         SCICreateSegment(v_dev, &local_segment, SEGMENT_ID, SEGMENT_SIZE, NO_CALLBACK,
@@ -412,14 +416,15 @@ int main(int argc, char **argv)
 
         SCIPrepareSegment(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
-        local_address = (int *) SCIMapLocalSegment(local_segment, &local_map, 0, 
+        local_address = (point *) SCIMapLocalSegment(local_segment, &local_map, 0, 
         SEGMENT_SIZE, 0, NO_FLAGS, &error);
         
-        write_points_segment(local_address, points, full_size);
+        // Storing size information into first position in segment
+        float size = (float) full_size;
+        point values = { size, 0.0, 0.0 };
+        memcpy(local_address, values, 1 * sizeof(point));
         
-        // Check if written to segment
-        point *p1 = &local_address[1];
-        printf("First coordinate is: %.1f %.1f %.1f\n", p1->x, p1->y, p1->weight);
+        write_points_segment(local_address, points, full_size);
         
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
