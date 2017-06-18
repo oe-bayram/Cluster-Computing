@@ -124,8 +124,8 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     for(i = offset; i < offset + compute_size; i++)
     {
         point *p = &points[i];
-        //print_points(points, point_size, node_id, iteration);
-        //print_points_segment(segment, node_id, iteration);
+        print_points(points, point_size, node_id, iteration, "Inside compute points");
+        print_points_segment(segment, node_id, iteration, "Inside compute segment");
         //printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
         if(p->weight == 0){
             printf("%d: Weight of points[%d] was 0: %.1f and points are: \n", node_id, i, p->weight);
@@ -148,22 +148,22 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
-print_points(point *points, int size, int node_id, int iteration){
+print_points(point *points, int size, int node_id, int iteration, char description[]){
     int k;
     for(k = 0; k<size; k++){
         point *p1 = &points[k];
-        printf("Iteration %d and node %d: Point values of %d are: %.1f %.1f %.1f\n", iteration, node_id, k, p1->x, p1->y, p1->weight);
+        printf("%s: Iteration %d and node %d: Point values of %d are: %.1f %.1f %.1f\n", description, iteration, node_id, k, p1->x, p1->y, p1->weight);
     }
 }
 
-print_points_segment(point *segment, int node_id, int iteration){
+print_points_segment(point *segment, int node_id, int iteration, char description[]){
     point *my_points;
     int my_size;
     int k;
     read_points_segment(segment, &my_points, &my_size, node_id);
     for(k = 0; k<my_size; k++){
         point *p1 = &my_points[k];
-        printf("Iteration %d and node %d: point values of %d are: %.1f %.1f %.1f\n", iteration, node_id, k, p1->x, p1->y, p1->weight);
+        printf("%s: Iteration %d and node %d: point values of %d are: %.1f %.1f %.1f\n", description, iteration, node_id, k, p1->x, p1->y, p1->weight);
     }
 }
 
