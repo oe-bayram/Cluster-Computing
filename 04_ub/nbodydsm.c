@@ -120,7 +120,8 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
     MPI_Barrier(MPI_COMM_WORLD);
-    read_points_segment(segment, &points, &full_size, node_id);
+    
+    read_points_segment(segment, &points, &point_size, node_id);
     //printf("%d: Barrier passed!", node_id);
 
     // compute new point position
