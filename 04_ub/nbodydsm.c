@@ -120,6 +120,7 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
     MPI_Barrier(MPI_COMM_WORLD);
+    read_points_segment(segment, &points, &full_size, node_id);
     //printf("%d: Barrier passed!", node_id);
 
     // compute new point position
@@ -265,7 +266,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
         print_points_segment(segment, node_id, i, 99, "Inside work segment");
         print_points(points, full_size, node_id, i, 99, "Inside work points");
         compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id, i);
-        read_points_segment(segment, &points, &full_size, node_id);
+        //read_points_segment(segment, &points, &full_size, node_id);
         //update_points(comm_size, points, full_size);
     }
         
