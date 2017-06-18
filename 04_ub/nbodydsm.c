@@ -98,17 +98,19 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     print_points(points, point_size, node_id, iteration, i, "Inside compute points before vel");
     print_points_segment(segment, node_id, iteration, i, "Inside compute segment before vel");
     
+    
+    
     //compute new point_vel for each point between offset and offset + compute_size
     for(i = offset; i < offset + compute_size; i++)
     {
-         point *p1 = &segment[i+1];
+         point *p1 = &points[i];
 // if weight == 0, point is absorbed and should be ignored
          if(p1->weight == 0) continue;
          
          vector acc = {0, 0};
          for(j = 0; j < point_size; j++)
          {
-              point *p2 = &segment[j+1];
+              point *p2 = &points[j];
     // if absorbed or same point ignore
               if (p2->weight == 0 || p1 == p2) continue;
               // add acceleration to total acceleration
@@ -120,13 +122,14 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
     MPI_Barrier(MPI_COMM_WORLD);
+    read_points_segment(segment, &points, &point_size, node_id);
     //printf("%d: Barrier passed!", node_id);
 
     // compute new point position
     //printf("%d: offset is: %d and offset + compute_size is: %d\n", node_id, offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
-        point *p = &segment[i+1];
+        point *p = &points[i];
         print_points(points, point_size, node_id, iteration, i, "Inside compute points");
         print_points_segment(segment, node_id, iteration, i, "Inside compute segment");
         //printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
@@ -265,7 +268,7 @@ void work(int node_id, int comm_size, point *points, int full_size, int iteratio
         print_points_segment(segment, node_id, i, 99, "Inside work segment");
         print_points(points, full_size, node_id, i, 99, "Inside work points");
         compute_movement(points, point_vel, offset, compute_size, full_size, segment, node_id, i);
-        //read_points_segment(segment, &points, &full_size, node_id);
+        read_points_segment(segment, &points, &full_size, node_id);
         //update_points(comm_size, points, full_size);
     }
         
