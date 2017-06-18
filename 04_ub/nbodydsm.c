@@ -95,6 +95,9 @@ void compute_movement(  point *points, vector *point_vel, unsigned int offset,
 {
     unsigned int i, j;
 
+    print_points(points, point_size, node_id, iteration, i, "Inside compute points before vel");
+    print_points_segment(segment, node_id, iteration, i, "Inside compute segment before vel");
+    
     //compute new point_vel for each point between offset and offset + compute_size
     for(i = offset; i < offset + compute_size; i++)
     {
