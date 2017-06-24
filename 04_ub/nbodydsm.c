@@ -95,10 +95,6 @@ void compute_movement(  volatile point *points, vector *point_vel, unsigned int 
 {
     unsigned int i, j;
 
-    // print_points(points, point_size, node_id, iteration, i, "Inside compute points before vel");
-    // print_points_segment(segment, node_id, iteration, i, "Inside compute segment before vel");
-    
-    
     //compute new point_vel for each point between offset and offset + compute_size
     for(i = offset; i < offset + compute_size; i++)
     {
@@ -121,54 +117,19 @@ void compute_movement(  volatile point *points, vector *point_vel, unsigned int 
     
     // Hier ein Barrier setzen, da Berechnungen der nächsten Iteration die aktuelle manipulieren würden
     MPI_Barrier(MPI_COMM_WORLD);
-    //printf("%d: Barrier passed!", node_id);
 
     // compute new point position
-    //printf("%d: offset is: %d and offset + compute_size is: %d\n", node_id, offset, offset + compute_size);
     for(i = offset; i < offset + compute_size; i++)
     {
         volatile point *p = &points[i];
-        // print_points(points, point_size, node_id, iteration, i, "Inside compute points");
-        // print_points_segment(segment, node_id, iteration, i, "Inside compute segment");
-        //printf("In Iteration %d is Node %d updating point %d with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
         if(p->weight == 0){
-            //printf("%d: Weight of points[%d] was 0: %.1f and points are: \n", node_id, i, p->weight);
-            //print_points_segment(segment, node_id, iteration);
             continue;
         }
         // apply movement
         p->x += point_vel[i - offset].x;
         p->y += point_vel[i - offset].y;
-        //printf("%d: point values of %d are: %.1f %.1f %.1f\n", node_id, i, p->x, p->y, p->weight);
-        // write new position to segment
-        //printf("In Iteration %d is Node %d writing point %d to segment with values: %.1f %.1f %.1f \n", iteration, node_id, i, p->x, p->y, p->weight);
-        //print_points_segment(segment, node_id, iteration);
-        
-        //write_point_segment(segment, p, i, node_id);
-        
-        //print_points_segment(segment, node_id, iteration);
-        
     }
 }
-
-// print_points(point *points, int size, int node_id, int iteration, int offset, char description[]){
-//     int k;
-//     for(k = 0; k<size; k++){
-//         point *p1 = &points[k];
-//         printf("%s: Iteration %d and node %d and offset %d: Point values of %d are: %.1f %.1f %.1f\n", description, iteration, node_id, offset, k, p1->x, p1->y, p1->weight);
-//     }
-// }
-
-// print_points_segment(point *segment, int node_id, int iteration, int offset, char description[]){
-//     point *my_points;
-//     int my_size;
-//     int k;
-//     read_points_segment(segment, &my_points, &my_size, node_id);
-//     for(k = 0; k<my_size; k++){
-//         point *p1 = &my_points[k];
-//         printf("%s: Iteration %d and node %d and offset %d: point values of %d are: %.1f %.1f %.1f\n", description, iteration, node_id, offset, k, p1->x, p1->y, p1->weight);
-//     }
-// }
 
 // Read point from file
 void read_point(char *filename, point **points, int *full_size)
@@ -253,20 +214,13 @@ void work(int node_id, int comm_size, volatile point *points, int full_size, int
     if(node_id == comm_size -1)
     compute_size = (full_size + comm_size -1 ) / comm_size ;
     
-    //printf("full_size: %d, comm_size: %d, node_id: %d, compute_size: %d\n", full_size, comm_size, node_id, compute_size);
-
     init_vel(&point_vel, compute_size);
     
     // Main loop
     int i;
     for(i = 0; i < iteration; i++)
     {
-        // printf("%d: Started computing for iteration: %d and points are: \n", node_id, i);
-        // print_points_segment(segment, node_id, i, 99, "Inside work segment");
-        // print_points(points, full_size, node_id, i, 99, "Inside work points");
         compute_movement(points, point_vel, offset, compute_size, full_size, node_id, i);
-        // read_points_segment(segment, &points, &full_size, node_id);
-        //update_points(comm_size, points, full_size);
     }
         
     free(point_vel);
@@ -292,47 +246,6 @@ fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
 
     fclose(fp);
 }
-
-// /*
-//     write_point_segment(local_address, A, B)
-//     write matrixes A and B and their sizes to segment
-// */
-// void write_point_segment(point *segment, point *p, int offset, int node_id)
-// {
-//     printf("%d: got this point: %.1f %.1f %.1f and offset is: %u\n", node_id, p->x, p->y, p->weight, offset);
-//     point *pos = segment;
-//     pos += 1;
-//     pos += (offset);
-//     memcpy(pos, p, 1 * sizeof(point));
-// }
-
-// /*
-//     initialise points segment with metadata and points from file
-// */
-// void write_points_segment(volatile point *segment, point *points, int full_size, int node_id)
-// {
-//     // first point store meta information
-//     point p = {(float) full_size, (float) node_id, 0.0};
-//     segment[0] = p;
-//     segment++;
-//     // write points to segment
-//     memcpy(segment, points, full_size * sizeof(point));
-// }
-
-// /*
-//     write_points_segment(local_address, A, B)
-//     write matrixes A and B and their sizes to segment
-// */
-// void read_points_segment(point *segment, point **points, int *full_size, int node_id)
-// {
-//     point *pos = segment;
-//     point *values = &segment[0];
-//     int size = (int) values->x;
-//     *full_size = size;
-//     pos += 1;
-//     *points = (point *) malloc(size * sizeof(point));
-//     memcpy(*points, pos, size * sizeof(point));
-// }
 
 /*
 Master:
@@ -413,21 +326,11 @@ int main(int argc, char **argv)
         memcpy(local_address, points, SEGMENT_SIZE);
         free(points);
 
-        // Storing size information into first position in segment
-        //float size = (float) full_size;
-        //point values = { size, 0.0, 0.0 };
-        //memcpy(local_address, &values, 1 * sizeof(point));
-        
-        //write_points_segment(local_address, points, full_size, node_id);
-        
         SCISetSegmentAvailable(local_segment, ADAPTER_NO, NO_FLAGS, &error);
 
         // send metadata to worker SCI root and size of point array
         int metadata[2] = {sci_id, full_size};
         MPI_Bcast(metadata, 2, MPI_INT, MASTER_ID, MPI_COMM_WORLD);
-
-        // send segment information to other nodes
-        // MPI_Bcast(&sci_id, 1, MPI_INT, node_id, MPI_COMM_WORLD);
 
         // Take time
         double time = MPI_Wtime();
@@ -438,8 +341,6 @@ int main(int argc, char **argv)
         // Final time
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
-        
-        //read_points_segment(local_address, &points, &full_size, node_id);
         
         write_point(argv[3], local_address, full_size);
     }
@@ -470,7 +371,6 @@ int main(int argc, char **argv)
         remote_address = (volatile point *) SCIMapRemoteSegment(remote_segment, 
             &remote_map, 0, segment_size, 0, NO_FLAGS, &error);
  
-        //read_points_segment(remote_address, &points, &full_size, node_id);
         work(node_id, comm_size, remote_address, full_size, iteration);
         
     }
