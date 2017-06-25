@@ -231,7 +231,7 @@ void work(int node_id, int comm_size, volatile point *points, int full_size, int
 }
 
 // write point back to output
-void write_point( char *filename, volatile point *points, int size) 
+void write_point( char *filename, volatile point *points, int size, double final_time, int iteration, int comm_size) 
 {
 
     FILE *fp;
@@ -243,6 +243,8 @@ void write_point( char *filename, volatile point *points, int size)
 point p = points[i];
 fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     }
+    
+    fprintf(fp, "\n\n\nSimulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
 
     fclose(fp);
 }
@@ -342,7 +344,7 @@ int main(int argc, char **argv)
         double final_time = MPI_Wtime() - time;
         printf("Simulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
         
-        write_point(argv[3], local_address, full_size);
+        write_point(argv[3], local_address, full_size, final_time, iteration, comm_size);
     }
     else
     {
