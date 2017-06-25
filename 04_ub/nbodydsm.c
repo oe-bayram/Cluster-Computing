@@ -244,7 +244,7 @@ point p = points[i];
 fprintf(fp, "%.1f %.1f %.1f\n", p.x, p.y, p.weight);
     }
     
-    fprintf(fp, "\n\n\nSimulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
+    //fprintf(fp, "\n\n\nSimulation took: %.1f sec, for: %d iterations with: %d nodes\n", final_time, iteration, comm_size);
 
     fclose(fp);
 }
